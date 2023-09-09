@@ -13,7 +13,12 @@ $padding = 30;
 $dot_size = 8;
 // Data
 // null - no data, -1 - illness
-$data = [[0, 6], [1, 4], [2, 7], [3, 10], [4, -1], [5, 7], [6, 6], [7, 4], [8, 5], [9, 3], [10, 2], [11, null], [12, null], [13, 4], [17, 8]];
+$data = [];
+fetchFromDatabase(
+    $host = "127.0.0.1",
+    $username = "root",
+    $password = "",
+    $database = "graph");
 $max_value = max(array_map(function($item) { return $item[1]; }, $data));
 $steps_vertical_number = 5;
 $step_vertical_value = $max_value / $steps_vertical_number;
@@ -77,6 +82,13 @@ function drawLinesBetweenPoints(){
             }
         }
     }
+}
+function fetchFromDatabase($host, $username, $password, $database){
+    global $data;
+    $connection = new mysqli($host, $username, $password, $database);
+    $result = $connection->query("SELECT * FROM data");
+    while($row = $result->fetch_assoc())
+        $data[] = [$row["argument"], $row["value"]];
 }
 
 drawCoordinates();
