@@ -9,11 +9,15 @@ $black = imagecolorallocate($canvas, 0, 0, 0);
 $grey = imagecolorallocate($canvas, 128, 128, 128);
 $red = imagecolorallocate($canvas, 255, 0, 0);
 $green = imagecolorallocate($canvas, 24, 163, 36);
-$padding = 30;
+$blue = imagecolorallocate($canvas, 36, 156, 255);
+$padding = 100;
 $dot_size = 8;
 // Data
 // null - no data, -1 - illness
 $data = [];
+$x_name = "a";
+$y_name = "b";
+$border_value = 2;
 fetchFromDatabase(
     $host = "127.0.0.1",
     $username = "root",
@@ -27,7 +31,7 @@ $steps_horizontal_number = count($data);
 $step_horizontal_width = ($width - 2 * $padding) / count($data);
 
 function drawCoordinates(){
-    global $canvas, $width, $height, $padding, $black, $grey, $white, $data, $steps_vertical_number, $step_vertical_height, $step_vertical_value, $steps_horizontal_number, $step_horizontal_width;
+    global $canvas, $width, $height, $padding, $black, $grey, $white, $data, $x_name, $y_name, $steps_vertical_number, $step_vertical_height, $step_vertical_value, $steps_horizontal_number, $step_horizontal_width;
     // Draw the background
     imagefilledrectangle($canvas, 0, 0, $width, $height, $white);
     // Axis
@@ -41,8 +45,9 @@ function drawCoordinates(){
         // Dashed horizontal lines
         if($i > 0)
             imageline($canvas, $padding + 1, $y, $width - $padding, $y, IMG_COLOR_STYLED);
-        imagestring($canvas, 3, 5, $y - 5, $i * $step_vertical_value, $black);
+        imagestring($canvas, 3, $padding - 40, $y - 5, $i * $step_vertical_value, $black);
     }
+    imagestringup($canvas, 8, ($padding - 40) / 2, $height / 2, $y_name, $black);
     // Arguments axis
     for($i = 0; $i < count($data); $i++){
         $x = $padding + $i * ($width - 2 * $padding) / count($data);
@@ -51,6 +56,7 @@ function drawCoordinates(){
             imageline($canvas, $x, $height - ($padding + 1), $x, $padding, IMG_COLOR_STYLED);
         imagestring($canvas, 3, $x, $height - $padding + 5, $data[$i][0], $black);
     }
+    imagestring($canvas, 8, $width / 2, $height - $padding / 2, $x_name, $black);
 }
 function drawValuePoints(){
     global $canvas, $padding, $height, $dot_size, $red, $grey, $green, $data, $step_vertical_height, $step_vertical_value, $step_horizontal_width;
@@ -70,7 +76,7 @@ function drawValuePoints(){
     }
 }
 function drawLinesBetweenPoints(){
-    global $data, $canvas, $height, $red, $step_vertical_value, $step_vertical_height, $step_horizontal_width, $padding;
+    global $data, $canvas, $width, $height, $red, $blue, $step_vertical_value, $step_vertical_height, $step_horizontal_width, $border_value, $padding;
     for($i = 0; $i < count($data); $i++){
         if($i > 0){
             $x1 = $padding + ($i - 1) * $step_horizontal_width;
@@ -82,13 +88,22 @@ function drawLinesBetweenPoints(){
             }
         }
     }
+    // Border value
+    $y = $height - $padding - ($border_value / $step_vertical_value) * $step_vertical_height;
+    imagestring($canvas, 3, $padding - 40, $y - 5, $border_value, $blue);
+    imageline($canvas, $padding, $y, $width - $padding, $y, $blue);
 }
 function fetchFromDatabase($host, $username, $password, $database){
-    global $data;
+    global $data, $x_name, $y_name, $border_value;
     $connection = new mysqli($host, $username, $password, $database);
     $result = $connection->query("SELECT * FROM data");
     while($row = $result->fetch_assoc())
         $data[] = [$row["argument"], $row["value"]];
+    $x_name = $connection->query("SELECT value FROM metadata WHERE name = 'x_name'")->fetch_assoc()["value"];
+    $y_name = $connection->query("SELECT value FROM metadata WHERE name = 'y_name'")->fetch_assoc()["value"];
+    $border_value = $connection->query("SELECT value FROM metadata WHERE name = 'border_value'")->fetch_assoc()["value"];
+
+    $connection->close();
 }
 
 drawCoordinates();
