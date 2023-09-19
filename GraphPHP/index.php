@@ -1,6 +1,6 @@
 <?php
 
-include "database.php";
+include "setup.php";
 
 $data = fetchFromDatabase()["data"];
 $width = array_key_exists("width", $_GET) ? $_GET["width"] : 650;
@@ -14,6 +14,21 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
 <head>
     <meta charset="UTF-8">
     <title>Graph</title>
+    <style>
+        dialog{
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        dialog form{
+            height: 200px;
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            justify-content: space-around;
+        }
+    </style>
 </head>
 <body>
     <h1>Graph</h1>
@@ -24,7 +39,7 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
             coords="<?= (($item[0]/count($data)) * ($width - 2 * $padding)) + $padding  ?>,
                     <?= $height - (($item[1] == -1 ? 0 : $item[1]/$max_value) * ($height - 2 * $padding) + $padding) ?>, 
                     8" 
-            onclick="dotClickHandler(<?= $item[0] ?>)"
+            onclick="dotClickHandler(<?= $item[0] ?>, <?= $item[1] ?>)"
             >
         <?php endforeach; ?>
     </map>
@@ -35,7 +50,17 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
         height=<?php echo $height?>"
         usemap="#graph" width="650px" height="400px">
     </div>
-    
+    <dialog>
+        <form> <!--action="update.php" method="POST"-->
+            <label for="index" class="dialog-title">Record no. </label>
+            <input type="hidden" name="id" value="">
+            <input type="number" name="value" id="index">
+            <button type="button" value="Submit" onclick="fetchNumber()">Submit</button>
+            <button type="button" name="No data" value="No data" onclick="fetchND()">No data</button>
+            <button type="button" name="Illness" value="Illness" onclick="fetchIll()">Illness</button>
+            <button type="button" onclick="document.querySelector('dialog').close()">Cancel</button>
+        </form>
+    </dialog>
     <div>
         <table>
             <thead>
@@ -57,7 +82,43 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
 </body>
 
 <script>
-    function dotClickHandler(index){
-        alert("Index: " + index);
+    function dotClickHandler(index, value){
+        document.querySelector("dialog").showModal();
+        document.querySelector("input[name='value']").value = value;
+        document.querySelector(".dialog-title").innerText = "Record no. " + index;
+        document.querySelector("input[name='id']").value = index;
+    }
+    
+    function fetchNumber(){
+        let index = document.querySelector("input[name='id']").value;
+        let value = document.querySelector("input[name='value']").value;
+        console.log(index, value);
+        fetch(`update.php?id=${index}&value=${value}`, {
+            method: "GET"
+        })
+        .then(response => {
+            document.querySelector("dialog").close();
+            document.querySelector("img").src = "image.php?width=<?php echo $width?>&height=<?php echo $height?>" + "&" + new Date().getTime();
+        })
+    }
+    function fetchND(){
+        let index = document.querySelector("input[name='id']").value;
+        fetch(`update.php?id=${index}&no_data=1`, {
+            method: "GET"
+        })
+        .then(response => {
+            document.querySelector("dialog").close();
+            document.querySelector("img").src = "image.php?width=<?php echo $width?>&height=<?php echo $height?>" + "&" + new Date().getTime();
+        });
+    }
+    function fetchIll(){
+        let index = document.querySelector("input[name='id']").value;
+        fetch(`update.php?id=${index}&illness=1`, {
+            method: "GET"
+        })
+        .then(response => {
+            document.querySelector("dialog").close();
+            document.querySelector("img").src = "image.php?width=<?php echo $width?>&height=<?php echo $height?>" + "&" + new Date().getTime();
+        });
     }
 </script>

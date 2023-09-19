@@ -1,5 +1,5 @@
 <?php
-include "database.php";
+include "setup.php";
 // Set width and height of the image based on url params
 $width = array_key_exists("width", $_GET) ? $_GET["width"] : 650;
 $height = array_key_exists("height", $_GET) ? $_GET["height"] : 400;
