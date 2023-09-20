@@ -48,7 +48,9 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
         src="image.php?
         width=<?php echo $width?>&
         height=<?php echo $height?>"
-        usemap="#graph" width="650px" height="400px">
+        usemap="#graph" width="650px" height="400px"
+        onload="calculateMap()"
+        >
     </div>
     <dialog>
         <form> <!--action="update.php" method="POST"-->
@@ -82,6 +84,34 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
 </body>
 
 <script>
+    function calculateMap(){
+        fetch("get_db_data.php", {
+            method: "POST"
+        })
+        .then(response => response.json())
+        .then(response => {
+            console.log(response);
+            // Generate the map areas based on the data in response
+            let map = document.querySelector("map");
+            map.innerHTML = "";
+            let data = response.data;
+            let width = <?php echo $width ?>;
+            let height = <?php echo $height ?>;
+            let padding = <?php echo $padding ?>;
+            let max_value = <?php echo $max_value ?>;
+
+            data.forEach((item, index) => {
+                let area = document.createElement("area");
+                area.shape = "circle";
+                area.coords = `${((item[0]/data.length) * (width - 2 * padding)) + padding},
+                                ${height - ((item[1] == -1 ? 0 : item[1]/max_value) * (height - 2 * padding) + padding)}, 
+                                8`;
+                area.onclick = () => dotClickHandler(item[0], item[1]);
+                map.appendChild(area);
+            });
+        });
+    }
+
     function dotClickHandler(index, value){
         document.querySelector("dialog").showModal();
         document.querySelector("input[name='value']").value = value;
