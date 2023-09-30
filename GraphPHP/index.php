@@ -17,9 +17,10 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
     <style>
         dialog{
             position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
+            width: 200px;
+            /* left: 50%; */
+            /* top: 50%; */
+            /* transform: translate(-50%, -50%); */
         }
         dialog form{
             height: 200px;
