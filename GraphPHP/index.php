@@ -49,7 +49,7 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
         src="image.php?
         width=<?php echo $width?>&
         height=<?php echo $height?>"
-        usemap="#graph" width="650px" height="400px"
+        usemap="#graph" width="<?php echo $width?>" height="<?php echo $height?>"
         onload="calculateMap()"
         >
     </div>
