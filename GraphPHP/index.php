@@ -57,7 +57,7 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
         <form> <!--action="update.php" method="POST"-->
             <label for="index" class="dialog-title">Record no. </label>
             <input type="hidden" name="id" value="">
-            <input type="number" name="value" id="index">
+            <input type="number" name="value" id="index" step="1">
             <button type="button" value="Submit" onclick="fetchNumber()">Submit</button>
             <button type="button" name="No data" value="No data" onclick="fetchND()">No data</button>
             <button type="button" name="Illness" value="Illness" onclick="fetchIll()">Illness</button>
@@ -123,14 +123,21 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
     function fetchNumber(){
         let index = document.querySelector("input[name='id']").value;
         let value = document.querySelector("input[name='value']").value;
+        console.log("Read value ", value, " ", isNaN(value));
+        if(isNaN(value) || value == ""){
+            document.querySelector("dialog").close();
+            return;
+        } 
         console.log(index, value);
         fetch(`update.php?id=${index}&value=${value}`, {
             method: "GET"
         })
         .then(response => {
-            document.querySelector("dialog").close();
             document.querySelector("img").src = "image.php?width=<?php echo $width?>&height=<?php echo $height?>" + "&" + new Date().getTime();
         })
+        .finally(() => { 
+            document.querySelector("dialog").close();
+        });
     }
     function fetchND(){
         let index = document.querySelector("input[name='id']").value;
