@@ -64,24 +64,7 @@ $max_value = max(array_map(function($item) { return $item[1]; }, $data))
             <button type="button" onclick="document.querySelector('dialog').close()">Cancel</button>
         </form>
     </dialog>
-    <div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Argument</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach($data as $item): ?>
-                    <tr>
-                        <td><?= $item[0] ?></td>
-                        <td><?= $item[1] ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
+    <a href="/pdf.php">Generate PDF</a>
 </body>
 
 <script>
