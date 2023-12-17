@@ -1,3 +1,4 @@
+// Send message on button click or enter key press
 document.querySelector(".entry-submit").addEventListener("click", sendMessage);
 document.addEventListener("keydown", event => {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -5,21 +6,17 @@ document.addEventListener("keydown", event => {
     }
 });
 
+window.onload = () => {
+    document.querySelector(".history").scrollTop = document.querySelector(".history").scrollHeight;
+    document.querySelector(".entry-input").focus();
+}
+
 function sendMessage() {
     const message = document.querySelector(".entry-input").value;
     if (!message) {
         return;
     }
-    fetchMessage(message)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            window.location.reload();
-        });
-    document.querySelector(".entry-input").value = "";
-}
-function fetchMessage(message){
-    return fetch(`send.php`, {
+    fetch(`send.php`, {
         method: "POST",
         body: JSON.stringify({
             user: "test-user",
@@ -28,5 +25,11 @@ function fetchMessage(message){
         headers: {
             "Content-Type": "application/json",
         }
-    });
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            window.location.reload();
+        });
+    document.querySelector(".entry-input").value = "";
 }
