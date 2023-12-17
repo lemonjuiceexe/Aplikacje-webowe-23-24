@@ -12,7 +12,23 @@
 </head>
 <body>
     <div class="wrapper">
-        <div class="history"></div>
+        <div class="history">
+            <div class="message">
+                <p class="author">test-user123</p>
+                <p class="timestamp">17/12/23 18:24</p> 
+                <p class="content">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid suscipit quisquam libero corporis placeat delectus.</p>
+            </div>
+            <div class="message">
+                <p class="author">test-user123</p>
+                <p class="timestamp">17/12/23 18:24</p> 
+                <p class="content">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid suscipit quisquam libero corporis placeat delectus.</p>
+            </div>
+            <div class="message">
+                <p class="author">test-user123</p>
+                <p class="timestamp">17/12/23 18:24</p> 
+                <p class="content">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid suscipit quisquam libero corporis placeat delectus.</p>
+            </div>
+        </div>
         <div class="entry">
             <input type="text" name="" class="entry-input">
             <button class="entry-submit">Send</button>

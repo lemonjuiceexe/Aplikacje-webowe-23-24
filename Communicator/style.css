@@ -6,6 +6,7 @@
 
 body{
     background-color: #1c1f21;
+    color: aliceblue;
     display: grid;
     place-items: center;
     height: 100vh;
@@ -17,9 +18,29 @@ body{
     border-radius: 2rem;
     background: #485563;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to right, #29323c, #485563);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #29323c, #485563); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    
+    background: linear-gradient(to right, #29323c, #485563); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */   
 }
+/* Message history */
+.message{
+    width: 90%;
+    margin: 1.4em auto;
+}
+.message p{
+    display: inline-block;
+}
+.message .author{
+    color: lightgreen;
+    font-size: 1.2em;
+}
+.message .timestamp{
+    float: right;
+    filter:brightness(0.7);
+}
+.message .author, .message .timestamp{
+    margin-bottom: 0.3em;
+}
+
+/* Entry */
 .entry{
     position: absolute;
     bottom: 20px;
