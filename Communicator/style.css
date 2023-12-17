@@ -21,6 +21,10 @@ body{
     background: linear-gradient(to right, #29323c, #485563); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */   
 }
 /* Message history */
+.history{
+    height: calc(90vh - 4rem - 2em);
+    overflow-y: scroll;
+}
 .message{
     width: 90%;
     margin: 1.4em auto;
@@ -28,15 +32,15 @@ body{
 .message p{
     display: inline-block;
 }
-.message .author{
+.message-author{
     color: lightgreen;
     font-size: 1.2em;
 }
-.message .timestamp{
+.message-timestamp{
     float: right;
     filter:brightness(0.7);
 }
-.message .author, .message .timestamp{
+.message-author, .message-timestamp{
     margin-bottom: 0.3em;
 }
 
