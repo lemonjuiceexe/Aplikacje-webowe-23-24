@@ -3,23 +3,23 @@ document.querySelector(".entry-submit").addEventListener("click", sendMessage);
 document.addEventListener("keydown", event => {
     if (event.key === "Enter" && !event.shiftKey) {
         const message = document.querySelector(".entry-input").value;
-        sendMessage("test-user", message);
+        sendMessage("8O", message);
     }
 });
 
 window.onload = () => {
     document.querySelector(".history").scrollTop = document.querySelector(".history").scrollHeight;
     document.querySelector(".entry-input").focus();
-}
 
-// Fetch the messages for the first time
-refreshMessages(false);
-// Constantly refresh messages using long polling
-(async () => {
-    while (true) {
-        await refreshMessages(true);
-    }
-})();
+    // Fetch the messages for the first time
+    refreshMessages(false);
+    // Constantly refresh messages using long polling
+    (async () => {
+        while (true) {
+            await refreshMessages(true);
+        }
+    })();
+}
 
 async function refreshMessages(longPolling) {
     const startTime = new Date();
@@ -37,9 +37,11 @@ async function refreshMessages(longPolling) {
                         </div>
                         <p class="message-content">${message.message}</p>
                     </div>
-                `;
+                    `;
     });
+    $(".message-content").emoticonize();
     document.querySelector(".history").scrollTop = document.querySelector(".history").scrollHeight;
+
 }
 function sendMessage(user, message) {
     if (!message) {

@@ -9,23 +9,14 @@
     <style>
         <?php include './style.css'; ?>
     </style>
+    <link href="stylesheets/jquery.cssemoticons.css" media="screen" rel="stylesheet" type="text/css" />
+    <script src="javascripts/jquery.js" type="text/javascript"></script>
+    <script src="javascripts/jquery.cssemoticons.js" type="text/javascript"></script>
+  </script>
 </head>
 <body>
     <div class="wrapper">
         <div class="history">
-            <!-- <?php 
-                include './server.php';
-
-                foreach($messages_on_request as $message){
-                    echo "<div class='message'>";
-                    echo "<div class='message-header'>";
-                    echo "<p class='message-author'>" . $message["user"] . "</p>";
-                    echo "<p class='message-timestamp'>" . date("d/m/y H:i", $message["timestamp"]) . "</p>";
-                    echo "</div>";
-                    echo "<p class='message-content'>" . $message["message"] . "</p>";
-                    echo "</div>";
-                }
-            ?> -->
         </div>
         <div class="entry">
             <input type="text" name="" class="entry-input">
