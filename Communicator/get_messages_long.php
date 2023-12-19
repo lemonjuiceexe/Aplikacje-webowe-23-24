@@ -13,7 +13,7 @@ $duration = 5;
 
 // For 5 seconds, check for new messages every half a second
 while(time() < $start_time + $duration){
-    usleep(500000);
+    usleep(50000);
     if($messages_on_request != get_messages()){
         $messages_on_request = get_messages();
         break;
@@ -21,4 +21,5 @@ while(time() < $start_time + $duration){
 }
 
 echo json_encode($messages_on_request);
+die();
 ?>

@@ -19,5 +19,6 @@ $messages_on_request[] = [
 $memcache->set("messages", $messages_on_request);
 
 echo json_encode($messages_on_request);
+die();
 
 ?>

@@ -1,5 +1,12 @@
+let refreshing = false;
+
+document.querySelector(".history").fakeScroll({});
+
 // Send message on button click or enter key press
-document.querySelector(".entry-submit").addEventListener("click", sendMessage);
+document.querySelector(".entry-submit").addEventListener("click", () => {
+    const message = document.querySelector(".entry-input").value;
+    sendMessage("8O", message);
+});
 document.addEventListener("keydown", event => {
     if (event.key === "Enter" && !event.shiftKey) {
         const message = document.querySelector(".entry-input").value;
@@ -8,17 +15,8 @@ document.addEventListener("keydown", event => {
 });
 
 window.onload = () => {
-    document.querySelector(".history").scrollTop = document.querySelector(".history").scrollHeight;
+    // document.querySelector(".history").scrollTop = document.querySelector(".history").scrollHeight;
     document.querySelector(".entry-input").focus();
-
-    // Fetch the messages for the first time
-    refreshMessages(false);
-    // Constantly refresh messages using long polling
-    (async () => {
-        while (true) {
-            await refreshMessages(true);
-        }
-    })();
 }
 
 async function refreshMessages(longPolling) {
@@ -27,9 +25,9 @@ async function refreshMessages(longPolling) {
     const endTime = new Date();
     const data = await response.json();
     console.log(`Refreshed messages in ${endTime - startTime}ms`);
-    document.querySelector(".history").innerHTML = "";
+    document.querySelector(".fakeScroll__content").innerHTML = "";
     data.forEach(message => {
-        document.querySelector(".history").innerHTML += `
+        document.querySelector(".fakeScroll__content").innerHTML += `
                     <div class="message">
                         <div class="message-header">
                             <p class="message-author">${message.user}</p>
@@ -40,11 +38,10 @@ async function refreshMessages(longPolling) {
                     `;
     });
     $(".message-content").emoticonize();
-    document.querySelector(".history").scrollTop = document.querySelector(".history").scrollHeight;
-
+    // document.querySelector(".history").scrollTop = document.querySelector(".history").scrollHeight;
 }
 function sendMessage(user, message) {
-    if (!message) {
+    if (!message || !user) {
         return;
     }
     fetch(`send.php`, {
@@ -57,10 +54,18 @@ function sendMessage(user, message) {
             "Content-Type": "application/json",
         }
     })
-        .then(response => response.json())
+        .then(response => response.text())
         .then(data => {
             console.log(data);
-            refreshMessages();
         });
     document.querySelector(".entry-input").value = "";
+    if (!refreshing) {
+        // Constantly refresh messages using long polling
+        (async () => {
+            while (true) {
+                await refreshMessages(true);
+            }
+        })();
+        refreshing = true;
+    }
 }

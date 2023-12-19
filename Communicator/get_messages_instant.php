@@ -5,7 +5,8 @@ function get_messages(){
     global $memcache;
     return $memcache->get('messages') ? $memcache->get('messages') : [];
 }
+header('Content-Type: application/json');
 
 echo json_encode(get_messages());
-
+die();
 ?>
