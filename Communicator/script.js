@@ -1,8 +1,8 @@
+const availableColors = ["tomato", "orange", "gold", "limegreen", "lightgreen", "deepskyblue", "mediumorchid", "deeppink"];
+const joinTimestamp = new Date();
 let refreshing = false;
 let username = "";
-let color = "lightgreen";
-const joinTimestamp = new Date();
-const availableColors = ["tomato", "orange", "gold", "limegreen", "lightgreen", "deepskyblue", "mediumorchid", "deeppink"];
+let color = availableColors[Math.floor(Math.random() * availableColors.length)];
 
 window.onload = () => {
     document.querySelector(".fakeScroll__content").scrollTop = document.querySelector(".fakeScroll__content").scrollHeight;
