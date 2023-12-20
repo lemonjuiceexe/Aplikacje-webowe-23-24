@@ -1,6 +1,4 @@
 <?php
-// $memcache = new Memcache();
-// $memcache->connect('localhost', 11211) or die ("Could not connect");
 $conn = mysqli_connect("localhost", "root", "", "communicator");
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
@@ -14,6 +12,9 @@ function get_messages(){
     }
     return $messages;
 }
+
+// Delete messages older than 5 minutes
+$conn->query("DELETE FROM `messages` WHERE `timestamp` < NOW() - INTERVAL 2 MINUTE");
 
 $messages_on_request = get_messages();
 

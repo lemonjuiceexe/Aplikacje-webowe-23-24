@@ -43,11 +43,11 @@ async function refreshMessages() {
                             <p class="message-author" style="color: ${message.color}">${message.user}</p>
                             <p class="message-timestamp">${message.formatted_timestamp}</p>
                         </div>
-                        <p class="message-content">${message.message}</p>
+                        <p class="message-content ${message.user === "System" ? "" : "emoticonize"}">${message.message}</p>
                     </div>
                     `;
     });
-    $(".message-content").emoticonize();
+    $(".emoticonize").emoticonize();
     document.querySelector(".fakeScroll__content").scrollTop = document.querySelector(".fakeScroll__content").scrollHeight;
 }
 function sendMessage(user, color, message) {
@@ -96,9 +96,13 @@ function parseCommand(message){
             break;
         case "/name":
             const oldUsername = username;
-            username = args.join(" ");
-            console.log('new username', username);
-            sendMessage("System", "lightgreen", `${oldUsername} username changed to ${username}`);
+            const newUsername = args.join(" ");
+            if(!newUsername){
+                sendMessage("System", "lightgreen", `Invalid username.`);
+                break;
+            }
+            username = newUsername;
+            sendMessage("System", "lightgreen", `${oldUsername} username changed to ${newUsername}`);
             break;
         case "/color":
             if(availableColors.includes(args[0])){
