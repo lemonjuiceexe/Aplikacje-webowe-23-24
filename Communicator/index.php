@@ -25,42 +25,6 @@
         <div class="history" id="scroll">
         <div class="fakeScroll__wrap">
             <div class="fakeScroll__content">
-                <div class="message">
-                        <div class="message-header">
-                            <p class="message-author">8O</p>
-                            <p class="message-timestamp">19/12/23 23:26</p>
-                        </div>
-                        <p class="message-content">a</p>
-                </div>
-                <div class="message">
-                    <div class="message-header">
-                        <p class="message-author">8O</p>
-                        <p class="message-timestamp">19/12/23 23:26</p>
-                    </div>
-                    <p class="message-content">a</p>
-                </div>
-                <div class="message">
-                    <div class="message-header">
-                        <p class="message-author">8O</p>
-                        <p class="message-timestamp">19/12/23 23:26</p>
-                    </div>
-                    <p class="message-content">a</p>
-                </div>
-                <div class="message">
-                    <div class="message-header">
-                        <p class="message-author">8O</p>
-                        <p class="message-timestamp">19/12/23 23:26</p>
-                    </div>
-                    <p class="message-content">a</p>
-                </div>
-                <div class="message">
-                    <div class="message-header">
-                        <p class="message-author">8O</p>
-                        <p class="message-timestamp">19/12/23 23:26</p>
-                    </div>
-                    <p class="message-content">a</p>
-                </div>
-                        
             </div>
         </div>
         </div>

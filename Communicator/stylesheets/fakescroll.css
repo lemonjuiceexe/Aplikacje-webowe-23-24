@@ -1,5 +1,5 @@
 /* Source: https://github.com/yairEO/fakescroll */
-.fakeScroll{ overflow:visible !important; }
+/* .fakeScroll{ overflow:visible !important; } */
 
 .fakeScroll__wrap{
     overflow : hidden;

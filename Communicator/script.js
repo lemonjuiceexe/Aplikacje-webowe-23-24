@@ -1,23 +1,25 @@
 let refreshing = false;
+let username = "";
+const joinTimestamp = new Date();
 
-document.querySelector(".history").fakeScroll({});
+window.onload = () => {
+    document.querySelector(".fakeScroll__content").scrollTop = document.querySelector(".fakeScroll__content").scrollHeight;
+    document.querySelector(".entry-input").focus();
+    document.querySelector(".history").fakeScroll({});
+    username = prompt("Enter your username:");
+}
 
 // Send message on button click or enter key press
 document.querySelector(".entry-submit").addEventListener("click", () => {
     const message = document.querySelector(".entry-input").value;
-    sendMessage("8O", message);
+    sendMessage(username, message);
 });
 document.addEventListener("keydown", event => {
     if (event.key === "Enter" && !event.shiftKey) {
         const message = document.querySelector(".entry-input").value;
-        sendMessage("8O", message);
+        sendMessage(username, message);
     }
 });
-
-window.onload = () => {
-    // document.querySelector(".history").scrollTop = document.querySelector(".history").scrollHeight;
-    document.querySelector(".entry-input").focus();
-}
 
 async function refreshMessages(longPolling) {
     const startTime = new Date();
@@ -27,6 +29,8 @@ async function refreshMessages(longPolling) {
     console.log(`Refreshed messages in ${endTime - startTime}ms`);
     document.querySelector(".fakeScroll__content").innerHTML = "";
     data.forEach(message => {
+        if(new Date(message.timestamp) < joinTimestamp)
+            return;
         document.querySelector(".fakeScroll__content").innerHTML += `
                     <div class="message">
                         <div class="message-header">
@@ -38,7 +42,7 @@ async function refreshMessages(longPolling) {
                     `;
     });
     $(".message-content").emoticonize();
-    // document.querySelector(".history").scrollTop = document.querySelector(".history").scrollHeight;
+    document.querySelector(".fakeScroll__content").scrollTop = document.querySelector(".fakeScroll__content").scrollHeight;
 }
 function sendMessage(user, message) {
     if (!message || !user) {
