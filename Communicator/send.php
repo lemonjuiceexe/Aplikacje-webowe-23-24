@@ -15,8 +15,10 @@ if (!$conn) {
 
 $now = time();
 $conn->query("
-    INSERT INTO `messages` (`user`, `message`, `timestamp`) 
-    VALUES ('{$_POST["user"]}', '{$_POST["message"]}', now())");
+    INSERT INTO `messages` (`user`, `message`, `timestamp`, `color`) 
+    VALUES ('{$_POST["user"]}', '{$_POST["message"]}', now(), '{$_POST["color"]}')");
+
+$conn->close();
 
 die();
 
