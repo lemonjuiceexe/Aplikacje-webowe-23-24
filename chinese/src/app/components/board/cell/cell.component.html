@@ -1,0 +1,12 @@
+<div
+  class="cell-wrapper"
+  [style.background-color]="backgroundColor"
+  [style.display]="display"
+>
+  {{childPawns.length}}
+  <div *ngFor="let pawn of childPawns" (click)="onPawnClick(pawn)">
+    <app-pawn
+      [pawn]="pawn"
+    ></app-pawn>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+.cell-wrapper{
+  width: 2em;
+  aspect-ratio: 1;
+  border: 1px solid black;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+}
+.cell-wrapper:hover{
+  background-color: #e6e6e6 !important;
+}

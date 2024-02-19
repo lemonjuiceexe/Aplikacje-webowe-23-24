@@ -1,0 +1,16 @@
+<div class="wrapper">
+  <div *ngFor="let cell of cells; index as i">
+    <app-cell *ngIf="!cell.empty else emptyCell"
+              [x]="cell.x" [y]="cell.y"
+              [color]="cell.color"
+              [childPawns]="cell.childPawns"
+              (pawnClicked)="updatePawn($event)"
+    />
+    <ng-template #emptyCell>
+      <app-cell [x]="i" [y]="0" [color]="0" [empty]=true />
+    </ng-template>
+  </div>
+<!--  <div *ngFor="let pawn of pawns; index as i">-->
+<!--    <app-pawn [color]="pawn.color" [path]="pawn.path" [cellsTraveled]="pawn.cellsTraveled"/>-->
+<!--  </div>-->
+</div>

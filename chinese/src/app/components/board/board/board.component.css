@@ -1,0 +1,9 @@
+.wrapper{
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  grid-template-rows: repeat(11, 1fr);
+  place-items: center;
+  height: 95vh;
+  aspect-ratio: 1;
+  margin: auto;
+}

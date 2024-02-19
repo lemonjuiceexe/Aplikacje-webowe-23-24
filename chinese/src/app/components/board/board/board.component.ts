@@ -1,0 +1,203 @@
+import { Component } from '@angular/core';
+import {CellComponent} from "../cell/cell.component";
+import {CommonModule} from "@angular/common";
+import {PawnComponent} from "../pawn/pawn.component";
+
+export enum Color{
+  Neutral,
+  Red,
+  Blue,
+  Green,
+  Yellow
+}
+interface ICell {
+  x: number;
+  y: number;
+  color: Color;
+  empty: boolean;
+  childPawns: IPawn[];
+}
+export interface IPawn {
+  color: Color;
+  path: number[];
+  cellsTraveled: number;
+}
+export const backgroundColors: string[] = ["beige", "tomato", "cornflowerblue", "#32de84", "gold"];
+
+@Component({
+  selector: 'app-board',
+  standalone: true,
+  imports: [
+    CellComponent,
+    CommonModule,
+    PawnComponent
+  ],
+  templateUrl: './board.component.html',
+  styleUrl: './board.component.css'
+})
+export class BoardComponent {
+  cells: ICell[] = [];
+  pawns: IPawn[] = [];
+
+  redHouses: number[] = [11 * 5 + 1, 11 * 5 + 2, 11 * 5 + 3, 11 * 5 + 4];
+  blueHouses: number[] = [11 * 5 + 6, 11 * 5 + 7, 11 * 5 + 8, 11 * 5 + 9];
+  yellowHouses: number[] = [11 * 1 + 5, 11 * 2 + 5, 11 * 3 + 5, 11 * 4 + 5];
+  greenHouses: number[] = [11 * 6 + 5, 11 * 7 + 5, 11 * 8 + 5, 11 * 9 + 5];
+
+  basePath: number[] = [
+    4*11+0, 4*11+1, 4*11+2, 4*11+3, 4*11+4,
+    3*11+4, 2*11+4, 1*11+4,
+    0*11+4, 0*11+5, 0*11+6,
+    1*11+6, 2*11+6, 3*11+6, 4*11+6,
+    4*11+7, 4*11+8, 4*11+9,
+    4*11+10, 5*11+10, 6*11+10,
+    6*11+9, 6*11+8, 6*11+7,
+    6*11+6, 7*11+6, 8*11+6, 9*11+6,
+    10*11+6, 10*11+5, 10*11+4,
+    9*11+4, 8*11+4, 7*11+4, 6*11+4,
+    6*11+3, 6*11+2, 6*11+1,
+    6*11+0, 5*11+0
+  ];
+  redPath: number[] = this.basePath.concat(this.redHouses);
+  yellowPath: number[] = this.basePath.slice(10).concat(this.yellowHouses).concat(this.basePath.slice(0, 10));
+  bluePath: number[] = this.basePath.slice(20).concat(this.blueHouses).concat(this.basePath.slice(0, 20));
+  greenPath: number[] = this.basePath.slice(30).concat(this.greenHouses).concat(this.basePath.slice(0, 30));
+
+  ngOnInit() {
+    //region ---- Generate pawns logic ----
+    for(let i = 0; i < 4; i++){
+      this.pawns.push({color: Color.Red, path: this.redPath, cellsTraveled: 0});
+      this.pawns.push({color: Color.Blue, path: this.bluePath, cellsTraveled: 0});
+      this.pawns.push({color: Color.Yellow, path: this.yellowPath, cellsTraveled: 0});
+      this.pawns.push({color: Color.Green, path: this.greenPath, cellsTraveled: 4});
+    }
+    //endregion
+
+    //region ---- Generate board logic ----
+    // Spawn cells
+    const redSpawns = [0, 1, 11 + 0, 11 + 1];
+    const blueSpawns = [9, 10, 11 + 9, 11 + 10];
+    const greenSpawns = [11 * 9, 11 * 9 + 1, 11 * 10, 11 * 10 + 1];
+    const yellowSpawns = [11 * 9 + 9, 11 * 9 + 10, 11 * 10 + 9, 11 * 10 + 10];
+    // Special cells
+    const redSpecial = [11 * 4 + 0];
+    const blueSpecial = [11 * 6 + 10];
+    const yellowSpecial = [11 * 0 + 6];
+    const greenSpecial = [11 * 10 + 4];
+    // Empty cells
+    const emptyCells = [
+      11 * 0 + 2, 11 * 0 + 3, 11 * 0 + 7, 11 * 0 + 8,
+      11 * 1 + 2, 11 * 1 + 3, 11 * 1 + 7, 11 * 1 + 8,
+      11 * 2 + 0, 11 * 2 + 1, 11 * 2 + 2, 11 * 2 + 3, 11 * 2 + 7, 11 * 2 + 8, 11 * 2 + 9, 11 * 2 + 10,
+      11 * 3 + 0, 11 * 3 + 1, 11 * 3 + 2, 11 * 3 + 3, 11 * 3 + 7, 11 * 3 + 8, 11 * 3 + 9, 11 * 3 + 10,
+      11 * 7 + 0, 11 * 7 + 1, 11 * 7 + 2, 11 * 7 + 3, 11 * 7 + 7, 11 * 7 + 8, 11 * 7 + 9, 11 * 7 + 10,
+      11 * 8 + 0, 11 * 8 + 1, 11 * 8 + 2, 11 * 8 + 3, 11 * 8 + 7, 11 * 8 + 8, 11 * 8 + 9, 11 * 8 + 10,
+      11 * 9 + 2, 11 * 9 + 3, 11 * 9 + 7, 11 * 9 + 8,
+      11 * 10 + 2, 11 * 10 + 3, 11 * 10 + 7, 11 * 10 + 8
+    ];
+
+    // Generate the board
+    for (let i = 0; i < 11; i++)
+      for (let j = 0; j < 11; j++){
+        let color: Color = Color.Neutral;
+        let empty: boolean = false;
+
+        //region Decide the color of the cell
+        if(
+          redSpawns.concat(this.redHouses).concat(redSpecial)
+            .includes(i * 11 + j))
+          color = Color.Red;
+        else if(
+          blueSpawns.concat(this.blueHouses).concat(blueSpecial)
+            .includes(i * 11 + j))
+          color = Color.Blue;
+        else if(
+          greenSpawns.concat(this.greenHouses).concat(greenSpecial)
+            .includes(i * 11 + j))
+          color = Color.Green;
+        else if(
+          yellowSpawns.concat(this.yellowHouses).concat(yellowSpecial)
+            .includes(i * 11 + j))
+          color = Color.Yellow;
+        //endregion
+        if(emptyCells.includes(i * 11 + j))
+          empty = true;
+
+        // Check child pawns
+        const childPawns: IPawn[] = this.pawns.filter(pawn =>{
+          let pawnsPath: number[] = [];
+          switch(pawn.color){
+            case Color.Red:
+              pawnsPath = this.redPath;
+              break;
+            case Color.Blue:
+              pawnsPath = this.bluePath;
+              break;
+            case Color.Green:
+              pawnsPath = this.greenPath;
+              break;
+            case Color.Yellow:
+              pawnsPath = this.yellowPath;
+              break;
+          }
+          const pawnsCoords: {x: number, y: number} = this.cellsTraveledToCoords(pawn.cellsTraveled, pawnsPath);
+          return pawnsCoords.x === j && pawnsCoords.y === i;
+        });
+        this.cells.push({x: j, y: i, color: color, empty: empty, childPawns: []});
+
+        this.refreshBoard();
+      }
+
+    //endregion
+  }
+
+  updatePawn(clickedPawn: IPawn){
+    const pawnIndex = this.pawns.findIndex(pawn => pawn.color === clickedPawn.color);
+    this.pawns[pawnIndex] = clickedPawn;
+    this.pawns[pawnIndex].cellsTraveled++;
+    this.refreshBoard();
+  }
+  refreshBoard(){
+    // ---- Update pawns positions ----
+    this.cells.forEach((cell: ICell) => {
+      cell.childPawns = this.pawns.filter(pawn => {
+        let pawnsPath: number[] = [];
+        switch(pawn.color){
+          case Color.Red:
+            pawnsPath = this.redPath;
+            break;
+          case Color.Blue:
+            pawnsPath = this.bluePath;
+            break;
+          case Color.Green:
+            pawnsPath = this.greenPath;
+            break;
+          case Color.Yellow:
+            pawnsPath = this.yellowPath;
+            break;
+        }
+        const pawnsCoords: {x: number, y: number} = this.cellsTraveledToCoords(pawn.cellsTraveled, pawnsPath);
+        return pawnsCoords.x === cell.x && pawnsCoords.y === cell.y;
+      });
+    });
+  }
+
+  cellsTraveledToCoords(cellsTraveled: number, path: number[]): {x: number, y: number}{
+    if(cellsTraveled === 0){
+      // calculate in which spawn the pawn should be
+      return {
+        x: 0,
+        y: 0
+      }
+    }
+    const currentCell = path[cellsTraveled - 1];
+    const x = currentCell % 11;
+    const y = Math.floor(currentCell / 11);
+
+    return {
+      x: x,
+      y: y
+    }
+  }
+
+}
