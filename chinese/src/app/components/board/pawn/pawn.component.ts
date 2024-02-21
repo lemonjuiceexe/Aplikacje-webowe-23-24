@@ -20,6 +20,7 @@ export class PawnComponent {
   }
 
   onClick(){
+    this.pawn.cellsTraveled++;
     this.pawnClicked.emit(this.pawn);
   }
 }

@@ -154,7 +154,6 @@ export class BoardComponent {
   updatePawn(clickedPawn: IPawn){
     const pawnIndex = this.pawns.findIndex(pawn => pawn.color === clickedPawn.color);
     this.pawns[pawnIndex] = clickedPawn;
-    this.pawns[pawnIndex].cellsTraveled++;
     this.refreshBoard();
   }
   refreshBoard(){
