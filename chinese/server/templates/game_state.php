@@ -1,5 +1,6 @@
 <?php
 enum Color: int {
+    case UNSET = -1;
     case RED = 0;
     case BLUE = 1;
     case GREEN = 2;
