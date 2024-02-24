@@ -1,0 +1,6 @@
+<h1>Hi, {{player.name}}</h1>
+<h2>You're in {{lobby?.id}}</h2>
+<ng-container *ngIf="lobby == null">
+  <input [(ngModel)]="player.name" type="text" placeholder="Username">
+  <button (click)="joinLobby($event)">Join lobby</button>
+</ng-container>

@@ -13,6 +13,7 @@ class Player
 }
 class Lobby
 {
+    public $id = 0;
     public $players = [];
     public $gameState = null;
     public $colorsAvailable = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW];
