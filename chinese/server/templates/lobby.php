@@ -2,13 +2,14 @@
 class Player
 {
     public $name = "";
-    // public $sessionId = ""; ??
+    public $secret = "";
     public $color = Color::UNSET;
     public $isReady = false;
 
     function __construct($name)
     {
         $this->name = $name;
+        $this->secret = md5($name . time() . rand());
     }
 }
 class Lobby
@@ -38,5 +39,22 @@ class Lobby
             array_push($this->players, $player);
         }
     }
+    function startGameIfReady()
+    {
+        $allReady = true;
+        foreach ($this->players as $player) {
+            if (!$player->isReady) {
+                $allReady = false;
+                break;
+            }
+        }
+        // start if all are ready or all 4 players joined, don't start with 0 or 1 player
+        if (count($this->players) <= 1 || (!$allReady && count($this->players) < 4)) {
+            return false;
+        }
 
+        // start the game
+        $this->gameState = new GameState();
+        return true;
+    }
 }

@@ -15,4 +15,7 @@
       </li>
     </ul>
   </ng-container>
+  <ng-container *ngIf="lobby != null && lobby?.gameState != null">
+    <p>the game has started</p>
+  </ng-container>
 </div>

@@ -41,6 +41,8 @@ while($lobby = $lobbies->fetch_assoc()) {
     if(count($lobbyObj->players) < 4 && $lobbyObj->gameState == null)
     {
         $lobbyObj->addPlayer($player);
+        // start the game if needed
+        $gameStarted = $lobbyObj->startGameIfReady();
         $connection->query("UPDATE lobbies SET lobby='".json_encode($lobbyObj)."' WHERE id=".$lobby["id"]);
         $lobbyFound = true;
         $lobbyJoined = $lobbyObj;
@@ -58,6 +60,7 @@ if(!$lobbyFound) {
     $lobbyJoined = $newLobby;
     $_SESSION["session"] = array("player" => $playerName, "lobby" => $newLobby);
 }
+
 $connection->close();
 
 // http_response_code(200);
