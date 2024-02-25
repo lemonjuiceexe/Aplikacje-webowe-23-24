@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {CellComponent} from "../cell/cell.component";
 import {CommonModule} from "@angular/common";
 import {PawnComponent} from "../pawn/pawn.component";
+import {GameStateServer, Lobby, Player} from "../../lobby/lobby.component";
 
 export enum Color{
   Neutral,
@@ -22,6 +23,12 @@ export interface IPawn {
   path: number[];
   cellsTraveled: number;
 }
+export interface GameStateClient {
+  pawns: IPawn[];
+  currentTurn: Color;
+  diceValue: number;
+}
+
 export const backgroundColors: string[] = ["beige", "tomato", "cornflowerblue", "#32de84", "gold"];
 
 @Component({
@@ -36,8 +43,27 @@ export const backgroundColors: string[] = ["beige", "tomato", "cornflowerblue", 
   styleUrl: './board.component.css'
 })
 export class BoardComponent {
+  @Input() player!: Player;
+  @Input() set lobby(lobby: Lobby){
+    // convert GameStateServer to GameStateClient
+    const serverState: GameStateServer = lobby.gameState!;
+    this.gameState = {
+      pawns: [],
+      currentTurn: serverState.currentTurn,
+      diceValue: serverState.diceValue
+    };
+    [serverState.redTravelled, serverState.blueTravelled, serverState.greenTravelled, serverState.yellowTravelled]
+    .forEach((travelled: number[]) => {
+      travelled.forEach((travelled: number) => {
+        this.gameState!.pawns.push({color: Color.Red, path: this.redPath, cellsTraveled: travelled});
+      })
+    });
+  }
+
+  gameState: GameStateClient | null = null;
+
   cells: ICell[] = [];
-  pawns: IPawn[] = [];
+  // pawns: IPawn[] = [];
 
   redHouses: number[] = [11 * 5 + 1, 11 * 5 + 2, 11 * 5 + 3, 11 * 5 + 4];
   blueHouses: number[] = [11 * 5 + 6, 11 * 5 + 7, 11 * 5 + 8, 11 * 5 + 9];
@@ -64,15 +90,6 @@ export class BoardComponent {
   greenPath: number[] = this.basePath.slice(30).concat(this.greenHouses).concat(this.basePath.slice(0, 30));
 
   ngOnInit() {
-    //region ---- Generate pawns logic ----
-    for(let i = 0; i < 4; i++){
-      this.pawns.push({color: Color.Red, path: this.redPath, cellsTraveled: 0});
-      this.pawns.push({color: Color.Blue, path: this.bluePath, cellsTraveled: 0});
-      this.pawns.push({color: Color.Yellow, path: this.yellowPath, cellsTraveled: 0});
-      this.pawns.push({color: Color.Green, path: this.greenPath, cellsTraveled: 4});
-    }
-    //endregion
-
     //region ---- Generate board logic ----
     // Spawn cells
     const redSpawns = [0, 1, 11 + 0, 11 + 1];
@@ -124,7 +141,7 @@ export class BoardComponent {
           empty = true;
 
         // Check child pawns
-        const childPawns: IPawn[] = this.pawns.filter(pawn =>{
+        const childPawns: IPawn[] = this.gameState!.pawns.filter(pawn =>{
           let pawnsPath: number[] = [];
           switch(pawn.color){
             case Color.Red:
@@ -152,14 +169,14 @@ export class BoardComponent {
   }
 
   updatePawn(clickedPawn: IPawn){
-    const pawnIndex = this.pawns.findIndex(pawn => pawn.color === clickedPawn.color);
-    this.pawns[pawnIndex] = clickedPawn;
+    const pawnIndex = this.gameState!.pawns.findIndex(pawn => pawn.color === clickedPawn.color);
+    this.gameState!.pawns[pawnIndex] = clickedPawn;
     this.refreshBoard();
   }
   refreshBoard(){
     // ---- Update pawns positions ----
     this.cells.forEach((cell: ICell) => {
-      cell.childPawns = this.pawns.filter(pawn => {
+      cell.childPawns = this.gameState!.pawns.filter(pawn => {
         let pawnsPath: number[] = [];
         switch(pawn.color){
           case Color.Red:

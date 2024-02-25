@@ -1,21 +1,24 @@
 <div class="wrapper">
   <h1>Hi, {{ player.name }}</h1>
   <h2>You're in lobby {{ lobby?.id }}</h2>
-  <ng-container *ngIf="lobby == null">
-    <input [(ngModel)]="player.name" type="text" placeholder="Username">
-    <button (click)="joinLobby($event)">Join lobby</button>
+  <p>game started: {{this.gameStarted}}</p>
+  <ng-container *ngIf="!this.gameStarted; else gameStartedBlock">
+    <ng-container *ngIf="lobby == null">
+      <input [(ngModel)]="player.name" type="text" placeholder="Username">
+      <button (click)="joinLobby($event)">Join lobby</button>
+    </ng-container>
+    <ng-container *ngIf="lobby != null">
+      <button (click)="toggleReady($event)">{{ this.player.isReady ? 'Unready' : 'Ready' }}</button>
+      <h2>Players in lobby:</h2>
+      <ul>
+        <li *ngFor="let player of lobby?.players">
+          {{ player.name }}: <span
+          [style.color]="player.isReady ? 'green' : 'red'">{{ player.isReady ? 'ready' : 'not ready' }}</span>
+        </li>
+      </ul>
+    </ng-container>
   </ng-container>
-  <ng-container *ngIf="lobby != null">
-    <button (click)="toggleReady($event)">{{ this.player.isReady ? 'Unready' : 'Ready' }}</button>
-    <h2>Players in lobby:</h2>
-    <ul>
-      <li *ngFor="let player of lobby?.players">
-        {{ player.name }}: <span
-        [style.color]="player.isReady ? 'green' : 'red'">{{ player.isReady ? 'ready' : 'not ready' }}</span>
-      </li>
-    </ul>
-  </ng-container>
-  <ng-container *ngIf="lobby != null && lobby?.gameState != null">
-    <p>the game has started</p>
-  </ng-container>
+  <ng-template #gameStartedBlock>
+    <app-board [player]="player" [lobby]="lobby!"></app-board>
+  </ng-template>
 </div>

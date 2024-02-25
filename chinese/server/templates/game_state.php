@@ -16,7 +16,7 @@ class GameState {
     public $diceValue = 0;
 
     function __construct() {
-        $this->redTravelled = [0, 0, 0, 0];
+        $this->redTravelled = [0, 7, 0, 0];
         $this->blueTravelled = [0, 0, 0, 0];
         $this->greenTravelled = [0, 0, 0, 0];
         $this->yellowTravelled = [0, 0, 0, 0];

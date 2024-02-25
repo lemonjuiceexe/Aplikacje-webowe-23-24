@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {Color} from "../board/board/board.component";
+import {BoardComponent, Color} from "../board/board/board.component";
 import {FormsModule} from "@angular/forms";
 import {NgForOf, NgIf} from "@angular/common";
 import { LobbyService } from "../../services/lobby.service";
@@ -13,7 +13,15 @@ export interface Player{
 export interface Lobby{
   id: number;
   players: Player[];
-  gameState: Object;
+  gameState: GameStateServer | null;
+}
+export interface GameStateServer {
+  redTravelled: number[];
+  blueTravelled: number[];
+  greenTravelled: number[];
+  yellowTravelled: number[];
+  currentTurn: Color;
+  diceValue: number;
 }
 interface JoinLobbyResponse {
   lobby: Lobby;
@@ -29,7 +37,8 @@ interface ToggleReadyResponse {
   imports: [
     FormsModule,
     NgIf,
-    NgForOf
+    NgForOf,
+    BoardComponent
   ],
   templateUrl: './lobby.component.html',
   styleUrl: './lobby.component.css',
@@ -42,6 +51,8 @@ export class LobbyComponent {
     isReady: false,
     color: Color.Red
   };
+
+  gameStarted: boolean = this.lobby !== null && this.lobby.gameState !== null;
 
   constructor(private lobbyService: LobbyService) { }
   joinLobby(e: Event) {
@@ -57,6 +68,8 @@ export class LobbyComponent {
 
         console.log(JSON.stringify(this.lobby));
         console.log("im " + this.player);
+
+        this.gameStarted = this.lobby !== null && this.lobby.gameState !== null;
       });
       // .then(text => text.text())
       // .then(text => console.log(text));
@@ -74,6 +87,8 @@ export class LobbyComponent {
         localStorage.setItem("lobby", JSON.stringify(this.lobby));
         this.player = this.lobby!.players.find(player => player.secret === this.player.secret)!;
         localStorage.setItem("player", JSON.stringify(this.player));
+
+        this.gameStarted = this.lobby !== null && this.lobby.gameState !== null;
       });
       // .then(text => text.text())
       // .then(text => console.log(text));

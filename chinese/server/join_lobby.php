@@ -63,6 +63,6 @@ if(!$lobbyFound) {
 
 $connection->close();
 
-// http_response_code(200);
+//FIXME: Can't just return all players with their secrets
 $response = array("player" => $player, "lobby" => $lobbyJoined);
 echo json_encode($response);
