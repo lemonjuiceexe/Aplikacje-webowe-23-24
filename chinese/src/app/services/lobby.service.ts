@@ -31,4 +31,14 @@ export class LobbyService {
       body: formData
     });
   }
+
+  getGameState(lobbyId: number) {
+    return fetch(`http://127.0.0.1/chinese/server/get_game_state.php?lobbyId=${lobbyId}`, {
+      method: "GET",
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost",
+        "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Credentials",
+      }
+    });
+  }
 }

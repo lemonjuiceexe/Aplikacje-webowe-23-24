@@ -55,6 +55,24 @@ export class LobbyComponent {
   gameStarted: boolean = this.lobby !== null && this.lobby.gameState !== null;
 
   constructor(private lobbyService: LobbyService) { }
+
+  ngOnInit() {
+    // Every 3 seconds fetch the current game state from the server
+    setInterval(() => {
+      if(!this.gameStarted) return;
+
+      this.lobbyService.getGameState(this.lobby!.id)
+        .then(response => response.json())
+        .then((response: GameStateServer) => {
+          this.lobby = {
+            ...this.lobby!,
+            gameState: response
+          };
+          localStorage.setItem("lobby", JSON.stringify(this.lobby));
+        });
+    }, 3000);
+  }
+
   joinLobby(e: Event) {
     e.preventDefault();
     e.stopPropagation();

@@ -58,6 +58,7 @@ export class BoardComponent {
         this.gameState!.pawns.push({color: Color.Red, path: this.redPath, cellsTraveled: travelled});
       })
     });
+    this.refreshBoard();
   }
 
   gameState: GameStateClient | null = null;
@@ -209,7 +210,6 @@ export class BoardComponent {
     const currentCell = path[cellsTraveled - 1];
     const x = currentCell % 11;
     const y = Math.floor(currentCell / 11);
-
     return {
       x: x,
       y: y
