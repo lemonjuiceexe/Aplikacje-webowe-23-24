@@ -13,7 +13,7 @@ export class LobbyService {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "http://localhost",
+        "Access-Control-Allow-Origin": "http://127.0.0.1",
         "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Credentials",
       }
     });

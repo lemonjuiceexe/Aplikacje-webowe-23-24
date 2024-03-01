@@ -9,7 +9,6 @@ import {Color, backgroundColors, BoardComponent, IPawn} from "../board/board.com
   styleUrl: './pawn.component.css'
 })
 export class PawnComponent {
-  // @Input() color: Color = Color.Neutral;
   @Input() pawn: IPawn = {color: Color.Neutral, path: [], cellsTraveled: 0};
   backgroundColor: string = backgroundColors[0];
 

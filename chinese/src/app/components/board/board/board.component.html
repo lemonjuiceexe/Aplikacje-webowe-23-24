@@ -10,7 +10,8 @@
       <app-cell [x]="i" [y]="0" [color]="0" [empty]=true />
     </ng-template>
   </div>
-<!--  <div *ngFor="let pawn of pawns; index as i">-->
-<!--    <app-pawn [color]="pawn.color" [path]="pawn.path" [cellsTraveled]="pawn.cellsTraveled"/>-->
-<!--  </div>-->
+  <app-dice (diceValueChange)="diceValueChange($event)"
+            [diceValue]="gameState!.diceValue"
+            [player]="player"
+            [lobbyId]="lobbyId" />
 </div>

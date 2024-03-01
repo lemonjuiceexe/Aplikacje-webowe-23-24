@@ -3,6 +3,7 @@ import {CellComponent} from "../cell/cell.component";
 import {CommonModule} from "@angular/common";
 import {PawnComponent} from "../pawn/pawn.component";
 import {GameStateServer, Lobby, Player} from "../../lobby/lobby.component";
+import {DiceComponent} from "../dice/dice.component";
 
 export enum Color{
   Neutral,
@@ -37,7 +38,8 @@ export const backgroundColors: string[] = ["beige", "tomato", "cornflowerblue", 
   imports: [
     CellComponent,
     CommonModule,
-    PawnComponent
+    PawnComponent,
+    DiceComponent
   ],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css'
@@ -45,6 +47,7 @@ export const backgroundColors: string[] = ["beige", "tomato", "cornflowerblue", 
 export class BoardComponent {
   @Input() player!: Player;
   @Input() set lobby(lobby: Lobby){
+    this.lobbyId = lobby.id;
     // convert GameStateServer to GameStateClient
     const serverState: GameStateServer = lobby.gameState!;
     this.gameState = {
@@ -61,6 +64,7 @@ export class BoardComponent {
     this.refreshBoard();
   }
 
+  lobbyId: number | null = null;
   gameState: GameStateClient | null = null;
 
   cells: ICell[] = [];
@@ -167,6 +171,11 @@ export class BoardComponent {
       }
 
     //endregion
+  }
+
+  diceValueChange(value: number){
+    console.log("dice in board component", value);
+    this.gameState!.diceValue = value;
   }
 
   updatePawn(clickedPawn: IPawn){
