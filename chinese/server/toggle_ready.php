@@ -12,11 +12,7 @@ $lobbyId = $_POST["lobbyId"];
 $connection = new mysqli("localhost", "chinese", "", "chinese");
 $lobby = $connection->query("SELECT * FROM lobbies WHERE id=".$lobbyId)->fetch_assoc();
 $lobbyData = json_decode($lobby["lobby"]);
-$lobbyObj = new Lobby();
-$lobbyObj->players = $lobbyData->players;
-$lobbyObj->gameState = $lobbyData->gameState;
-$lobbyObj->colorsAvailable = $lobbyData->colorsAvailable;
-$lobbyObj->id = $lobby["id"];
+$lobbyObj = new Lobby($lobby["id"], $lobbyData->players, $lobbyData->gameState, $lobbyData->colorsAvailable);
 
 $playerFound = false;
 foreach($lobbyObj->players as $player) {

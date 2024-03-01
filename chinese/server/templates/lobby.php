@@ -19,10 +19,12 @@ class Lobby
     public $gameState = null;
     public $colorsAvailable = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW];
 
-    function __construct()
+    function __construct($id = 0, $players = [], $gameState = null, $colorsAvailable = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW])
     {
-        $this->players = [];
-        $this->gameState = null;
+        $this->id = $id;
+        $this->players = $players;
+        $this->gameState = $gameState;
+        $this->colorsAvailable = $colorsAvailable;
     }
     function addPlayer($player)
     {
