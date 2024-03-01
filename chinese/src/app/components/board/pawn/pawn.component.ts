@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Color, backgroundColors, BoardComponent, IPawn} from "../board/board.component";
+import {Color, backgroundColors, BoardComponent, Pawn} from "../board/board.component";
 
 @Component({
   selector: 'app-pawn',
@@ -9,17 +9,16 @@ import {Color, backgroundColors, BoardComponent, IPawn} from "../board/board.com
   styleUrl: './pawn.component.css'
 })
 export class PawnComponent {
-  @Input() pawn: IPawn = {color: Color.Neutral, path: [], cellsTraveled: 0};
+  @Input() pawn: Pawn = {color: Color.Neutral, path: [], cellsTraveled: 0};
   backgroundColor: string = backgroundColors[0];
 
-  @Output() pawnClicked = new EventEmitter<IPawn>();
+  @Output() pawnClicked = new EventEmitter<Pawn>();
 
   ngOnInit(){
     this.backgroundColor = backgroundColors[this.pawn.color];
   }
 
   onClick(){
-    this.pawn.cellsTraveled++;
     this.pawnClicked.emit(this.pawn);
   }
 }

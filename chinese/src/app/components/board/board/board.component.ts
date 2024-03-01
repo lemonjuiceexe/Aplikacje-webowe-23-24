@@ -4,6 +4,7 @@ import {CommonModule} from "@angular/common";
 import {PawnComponent} from "../pawn/pawn.component";
 import {GameStateServer, Lobby, Player} from "../../lobby/lobby.component";
 import {DiceComponent} from "../dice/dice.component";
+import {GameService} from "../../../services/game.service";
 
 export enum Color{
   Neutral,
@@ -12,20 +13,20 @@ export enum Color{
   Green,
   Yellow
 }
-interface ICell {
+interface Cell {
   x: number;
   y: number;
   color: Color;
   empty: boolean;
-  childPawns: IPawn[];
+  childPawns: Pawn[];
 }
-export interface IPawn {
+export interface Pawn {
   color: Color;
   path: number[];
   cellsTraveled: number;
 }
 export interface GameStateClient {
-  pawns: IPawn[];
+  pawns: Pawn[];
   currentTurn: Color;
   diceValue: number;
 }
@@ -48,27 +49,16 @@ export class BoardComponent {
   @Input() player!: Player;
   @Input() set lobby(lobby: Lobby){
     this.lobbyId = lobby.id;
-    // convert GameStateServer to GameStateClient
-    const serverState: GameStateServer = lobby.gameState!;
-    this.gameState = {
-      pawns: [],
-      currentTurn: serverState.currentTurn,
-      diceValue: serverState.diceValue
-    };
-    [serverState.redTravelled, serverState.blueTravelled, serverState.greenTravelled, serverState.yellowTravelled]
-    .forEach((travelled: number[]) => {
-      travelled.forEach((travelled: number) => {
-        this.gameState!.pawns.push({color: Color.Red, path: this.redPath, cellsTraveled: travelled});
-      })
-    });
+    this.gameState = this.serverGameStateToClientGameState(lobby.gameState!);
+
     this.refreshBoard();
   }
 
   lobbyId: number | null = null;
   gameState: GameStateClient | null = null;
 
-  cells: ICell[] = [];
-  // pawns: IPawn[] = [];
+  cells: Cell[] = [];
+  // pawns: Pawn[] = [];
 
   redHouses: number[] = [11 * 5 + 1, 11 * 5 + 2, 11 * 5 + 3, 11 * 5 + 4];
   blueHouses: number[] = [11 * 5 + 6, 11 * 5 + 7, 11 * 5 + 8, 11 * 5 + 9];
@@ -94,6 +84,7 @@ export class BoardComponent {
   bluePath: number[] = this.basePath.slice(20).concat(this.blueHouses).concat(this.basePath.slice(0, 20));
   greenPath: number[] = this.basePath.slice(30).concat(this.greenHouses).concat(this.basePath.slice(0, 30));
 
+  constructor (private gameService: GameService) {}
   ngOnInit() {
     //region ---- Generate board logic ----
     // Spawn cells
@@ -146,7 +137,7 @@ export class BoardComponent {
           empty = true;
 
         // Check child pawns
-        const childPawns: IPawn[] = this.gameState!.pawns.filter(pawn =>{
+        const childPawns: Pawn[] = this.gameState!.pawns.filter(pawn =>{
           let pawnsPath: number[] = [];
           switch(pawn.color){
             case Color.Red:
@@ -178,14 +169,23 @@ export class BoardComponent {
     this.gameState!.diceValue = value;
   }
 
-  updatePawn(clickedPawn: IPawn){
+  updatePawn(clickedPawn: Pawn){
     const pawnIndex = this.gameState!.pawns.findIndex(pawn => pawn.color === clickedPawn.color);
+
+    this.gameService.movePawn(this.player, this.lobbyId!, clickedPawn)
+      // .then(response => response.json())
+      // .then((data: GameStateServer) => {
+      //   this.gameState = this.serverGameStateToClientGameState(data);
+      // });
+      .then(response => response.text())
+      .then(response => console.log(response));
+
     this.gameState!.pawns[pawnIndex] = clickedPawn;
     this.refreshBoard();
   }
   refreshBoard(){
     // ---- Update pawns positions ----
-    this.cells.forEach((cell: ICell) => {
+    this.cells.forEach((cell: Cell) => {
       cell.childPawns = this.gameState!.pawns.filter(pawn => {
         let pawnsPath: number[] = [];
         switch(pawn.color){
@@ -223,6 +223,26 @@ export class BoardComponent {
       x: x,
       y: y
     }
+  }
+  serverGameStateToClientGameState(serverState: GameStateServer): GameStateClient{
+    let clientGameState: GameStateClient = {
+      pawns: [],
+      currentTurn: serverState.currentTurn,
+      diceValue: serverState.diceValue
+    };
+    [serverState.redTravelled, serverState.blueTravelled, serverState.greenTravelled, serverState.yellowTravelled]
+    .forEach((travelled: number[], index: number) => {
+      travelled.forEach((travelled: number) => {
+        clientGameState.pawns.push({
+            color: (index+1) as Color,
+            path: this.redPath, 
+            cellsTraveled: travelled
+          }
+        );
+      })
+    });
+
+    return clientGameState;
   }
 
 }
