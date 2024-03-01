@@ -235,7 +235,7 @@ export class BoardComponent {
       travelled.forEach((travelled: number) => {
         clientGameState.pawns.push({
             color: (index+1) as Color,
-            path: this.redPath, 
+            path: this.redPath,
             cellsTraveled: travelled
           }
         );

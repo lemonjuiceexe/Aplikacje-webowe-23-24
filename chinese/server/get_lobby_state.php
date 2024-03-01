@@ -9,8 +9,7 @@ if(!isset($_GET["lobbyId"])){
 $connection = new mysqli("localhost", "chinese", "", "chinese");
 $lobby = $connection->query("SELECT * FROM lobbies WHERE id=".$_GET["lobbyId"])->fetch_assoc();
 $lobbyData = json_decode($lobby["lobby"]);
-$lobbyObj = new Lobby();
-$lobbyObj->gameState = $lobbyData->gameState;
+$lobbyObj = new Lobby($lobbyData->id, $lobbyData->players, $lobbyData->gameState, $lobbyData->colorsAvailable);
 $connection->close();
 
-echo json_encode($lobbyObj->gameState);
+echo json_encode(["players" => $lobbyObj->players, "gameState" => $lobbyObj->gameState]);

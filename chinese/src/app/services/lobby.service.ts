@@ -32,8 +32,8 @@ export class LobbyService {
     });
   }
 
-  getGameState(lobbyId: number) {
-    return fetch(`http://127.0.0.1/chinese/server/get_game_state.php?lobbyId=${lobbyId}`, {
+  getLobbyState(lobbyId: number) {
+    return fetch(`http://127.0.0.1/chinese/server/get_lobby_state.php?lobbyId=${lobbyId}`, {
       method: "GET",
       headers: {
         "Access-Control-Allow-Origin": "http://localhost",
