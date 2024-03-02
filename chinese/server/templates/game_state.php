@@ -98,10 +98,7 @@ class GameState {
             };
             for($j = 0; $j < 4; $j++){
                 $otherCell = standardiseCellsTraveled($otherTraveled[$j], $i + 1);
-                error_log("Checking $otherCell == $newCell");
                 if($otherCell == $newCell){
-                    $c = $i+1;
-                    error_log("Pawn of color $c taken by color $color");
                     $otherTraveled[$j] = 0;
                 }
             }
@@ -114,5 +111,28 @@ class GameState {
         }
 
         return $this;
+    }
+
+    function checkWin(){
+        foreach(
+            [$this->redTravelled, $this->blueTravelled, $this->greenTravelled, $this->yellowTravelled] 
+            as $index=>$traveled
+        ){
+            error_log(json_encode($this->redTravelled));
+            error_log($this->redTravelled == [41, 42, 43, 44] ? "true" : "false");
+            error_log(json_encode($this->blueTravelled));
+            error_log($this->blueTravelled == [41, 42, 43, 44] ? "true" : "false");
+            error_log(json_encode($this->greenTravelled));
+            error_log($this->greenTravelled == [41, 42, 43, 44] ? "true" : "false");
+            error_log(json_encode($this->yellowTravelled));
+            error_log($this->yellowTravelled == [41, 42, 43, 44] ? "true" : "false");
+
+            error_log("traveled: " . sort($traveled));
+            sort($traveled);
+            if($traveled == [41, 42, 43, 44]){
+                return Color::from($index - 1);
+            } 
+        }
+        return null;
     }
 }

@@ -34,6 +34,10 @@ foreach($lobbyObj->players as $player) {
             return;
         }
         $gameStateObj->movePawn($player->color, $cellsTraveled);
+        $winner = $gameStateObj->checkWin();
+        $winnerIsNull = $winner == null;
+        error_log("returned $winnerIsNull");
+
         $lobbyObj->gameState = $gameStateObj;
 
         $connection->query("UPDATE lobbies SET lobby='".json_encode($lobbyObj)."' WHERE id=".$lobby["id"]);
@@ -41,5 +45,12 @@ foreach($lobbyObj->players as $player) {
     }
 }
 
-$connection->close();
 echo json_encode($lobbyObj->gameState);
+// If there's a winner the game is over.
+// Return current game state to the client so it can display the winner.
+// Only then set the game state to null so the client will exit to the lobby after the next fetch.
+if($winner != null){
+    $lobbyObj->gameState = null;
+    $connection->query("UPDATE lobbies SET lobby='".json_encode($lobbyObj)."' WHERE id=".$lobby["id"]);
+}
+$connection->close();
