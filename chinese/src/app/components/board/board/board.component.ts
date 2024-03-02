@@ -20,6 +20,7 @@ interface Cell {
   color: Color;
   empty: boolean;
   childPawns: Pawn[];
+  highlighted: boolean;
 }
 
 export interface Pawn {
@@ -63,12 +64,13 @@ export class BoardComponent {
 
   cells: Cell[] = [];
 
+  highlightedCell: number | null = null;
+
   redHouses: number[] = [11 * 5 + 1, 11 * 5 + 2, 11 * 5 + 3, 11 * 5 + 4];
   blueHouses: number[] = [11 * 5 + 6, 11 * 5 + 7, 11 * 5 + 8, 11 * 5 + 9];
   yellowHouses: number[] = [11 * 1 + 5, 11 * 2 + 5, 11 * 3 + 5, 11 * 4 + 5];
   greenHouses: number[] = [11 * 6 + 5, 11 * 7 + 5, 11 * 8 + 5, 11 * 9 + 5];
 
-  // Spawn cells
   redSpawns = [0, 1, 11 + 0, 11 + 1];
   blueSpawns = [9, 10, 11 + 9, 11 + 10];
   greenSpawns = [11 * 9, 11 * 9 + 1, 11 * 10, 11 * 10 + 1];
@@ -162,7 +164,14 @@ export class BoardComponent {
           const pawnsCoords: { x: number, y: number } = this.cellsTraveledToCoords(pawn.cellsTraveled, pawnsPath, pawn.spawnCell);
           return pawnsCoords.x === j && pawnsCoords.y === i;
         });
-        this.cells.push({x: j, y: i, color: color, empty: empty, childPawns: []});
+        this.cells.push({
+          x: j,
+          y: i,
+          color: color,
+          empty: empty,
+          childPawns: [],
+          highlighted: false
+        });
 
         this.refreshBoard();
       }
@@ -174,20 +183,33 @@ export class BoardComponent {
     this.gameState!.diceValue = value;
   }
 
-  updatePawn(clickedPawn: Pawn) {
+  updatePawnOnClick(clickedPawn: Pawn) {
+    if(clickedPawn.color !== this.player!.color) return;
+
     const pawnIndex = this.gameState!.pawns.findIndex(pawn => pawn.color === clickedPawn.color);
 
     this.gameService.movePawn(this.player, this.lobbyId!, clickedPawn)
-      // .then(response => response.json())
-      // .then((data: GameStateServer) => {
-      //   this.gameState = this.serverGameStateToClientGameState(data);
-      // });
-      .then(response => response.text())
-      .then(response => console.log(response));
+      .then(response => response.json())
+      .then((data: GameStateServer) => {
+        this.gameState = this.serverGameStateToClientGameState(data);
+        this.gameState!.pawns[pawnIndex] = clickedPawn;
+        this.refreshBoard();
+      });
+      // .then(response => response.text())
+      // .then(response => console.log(response));
+  }
+  updatePawnOnHover(hoveredPawn: Pawn | null) {
+    if(hoveredPawn === null) {
+      this.highlightedCell = null;
+      this.refreshBoard();
+      return;
+    }
+    if(hoveredPawn.color !== this.player!.color) return;
 
-    this.gameState!.pawns[pawnIndex] = clickedPawn;
+    this.highlightedCell = hoveredPawn.path[hoveredPawn.cellsTraveled + this.gameState!.diceValue - 1];
     this.refreshBoard();
   }
+
   refreshBoard() {
     // ---- Update pawns positions ----
     this.cells.forEach((cell: Cell) => {
@@ -210,6 +232,10 @@ export class BoardComponent {
         const pawnsCoords: { x: number, y: number } = this.cellsTraveledToCoords(pawn.cellsTraveled, pawnsPath, pawn.spawnCell);
         return pawnsCoords.x === cell.x && pawnsCoords.y === cell.y;
       });
+    });
+    // ---- Update highlighted cells ----
+    this.cells.forEach((cell: Cell) => {
+      cell.highlighted = this.highlightedCell === (cell.x + cell.y * 11);
     });
   }
 
@@ -236,7 +262,7 @@ export class BoardComponent {
         travelled.forEach((travelled: number, pawnIndex: number) => {
           clientGameState.pawns.push({
               color: (colorIndex + 1) as Color,
-              path: this.redPath,
+              path: [this.redPath, this.bluePath, this.greenPath, this.yellowPath][colorIndex],
               cellsTraveled: travelled,
               spawnCell: [this.redSpawns, this.blueSpawns, this.greenSpawns, this.yellowSpawns][colorIndex][pawnIndex]
             }

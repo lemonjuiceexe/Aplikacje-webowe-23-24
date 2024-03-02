@@ -13,6 +13,7 @@ export class PawnComponent {
   backgroundColor: string = backgroundColors[0];
 
   @Output() pawnClicked = new EventEmitter<Pawn>();
+  @Output() pawnHovered = new EventEmitter<Pawn | null>();
 
   ngOnInit(){
     this.backgroundColor = backgroundColors[this.pawn.color];
@@ -20,5 +21,11 @@ export class PawnComponent {
 
   onClick(){
     this.pawnClicked.emit(this.pawn);
+  }
+  onMouseEnter() {
+    this.pawnHovered.emit(this.pawn);
+  }
+  onMouseLeave() {
+    this.pawnHovered.emit(null);
   }
 }
