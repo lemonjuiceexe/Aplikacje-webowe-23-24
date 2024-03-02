@@ -6,13 +6,14 @@ import {GameStateServer, Lobby, Player} from "../../lobby/lobby.component";
 import {DiceComponent} from "../dice/dice.component";
 import {GameService} from "../../../services/game.service";
 
-export enum Color{
+export enum Color {
   Neutral,
   Red,
   Blue,
   Green,
   Yellow
 }
+
 interface Cell {
   x: number;
   y: number;
@@ -20,11 +21,14 @@ interface Cell {
   empty: boolean;
   childPawns: Pawn[];
 }
+
 export interface Pawn {
   color: Color;
   path: number[];
   cellsTraveled: number;
+  spawnCell: number;
 }
+
 export interface GameStateClient {
   pawns: Pawn[];
   currentTurn: Color;
@@ -47,7 +51,7 @@ export const backgroundColors: string[] = ["beige", "tomato", "cornflowerblue", 
 })
 export class BoardComponent {
   @Input() player!: Player;
-  @Input() set lobby(lobby: Lobby){
+  @Input() set lobby(lobby: Lobby) {
     this.lobbyId = lobby.id;
     this.gameState = this.serverGameStateToClientGameState(lobby.gameState!);
 
@@ -58,40 +62,42 @@ export class BoardComponent {
   gameState: GameStateClient | null = null;
 
   cells: Cell[] = [];
-  // pawns: Pawn[] = [];
 
   redHouses: number[] = [11 * 5 + 1, 11 * 5 + 2, 11 * 5 + 3, 11 * 5 + 4];
   blueHouses: number[] = [11 * 5 + 6, 11 * 5 + 7, 11 * 5 + 8, 11 * 5 + 9];
   yellowHouses: number[] = [11 * 1 + 5, 11 * 2 + 5, 11 * 3 + 5, 11 * 4 + 5];
   greenHouses: number[] = [11 * 6 + 5, 11 * 7 + 5, 11 * 8 + 5, 11 * 9 + 5];
 
+  // Spawn cells
+  redSpawns = [0, 1, 11 + 0, 11 + 1];
+  blueSpawns = [9, 10, 11 + 9, 11 + 10];
+  greenSpawns = [11 * 9, 11 * 9 + 1, 11 * 10, 11 * 10 + 1];
+  yellowSpawns = [11 * 9 + 9, 11 * 9 + 10, 11 * 10 + 9, 11 * 10 + 10];
+
   basePath: number[] = [
-    4*11+0, 4*11+1, 4*11+2, 4*11+3, 4*11+4,
-    3*11+4, 2*11+4, 1*11+4,
-    0*11+4, 0*11+5, 0*11+6,
-    1*11+6, 2*11+6, 3*11+6, 4*11+6,
-    4*11+7, 4*11+8, 4*11+9,
-    4*11+10, 5*11+10, 6*11+10,
-    6*11+9, 6*11+8, 6*11+7,
-    6*11+6, 7*11+6, 8*11+6, 9*11+6,
-    10*11+6, 10*11+5, 10*11+4,
-    9*11+4, 8*11+4, 7*11+4, 6*11+4,
-    6*11+3, 6*11+2, 6*11+1,
-    6*11+0, 5*11+0
+    4 * 11 + 0, 4 * 11 + 1, 4 * 11 + 2, 4 * 11 + 3, 4 * 11 + 4,
+    3 * 11 + 4, 2 * 11 + 4, 1 * 11 + 4,
+    0 * 11 + 4, 0 * 11 + 5, 0 * 11 + 6,
+    1 * 11 + 6, 2 * 11 + 6, 3 * 11 + 6, 4 * 11 + 6,
+    4 * 11 + 7, 4 * 11 + 8, 4 * 11 + 9,
+    4 * 11 + 10, 5 * 11 + 10, 6 * 11 + 10,
+    6 * 11 + 9, 6 * 11 + 8, 6 * 11 + 7,
+    6 * 11 + 6, 7 * 11 + 6, 8 * 11 + 6, 9 * 11 + 6,
+    10 * 11 + 6, 10 * 11 + 5, 10 * 11 + 4,
+    9 * 11 + 4, 8 * 11 + 4, 7 * 11 + 4, 6 * 11 + 4,
+    6 * 11 + 3, 6 * 11 + 2, 6 * 11 + 1,
+    6 * 11 + 0, 5 * 11 + 0
   ];
   redPath: number[] = this.basePath.concat(this.redHouses);
   yellowPath: number[] = this.basePath.slice(10).concat(this.yellowHouses).concat(this.basePath.slice(0, 10));
   bluePath: number[] = this.basePath.slice(20).concat(this.blueHouses).concat(this.basePath.slice(0, 20));
   greenPath: number[] = this.basePath.slice(30).concat(this.greenHouses).concat(this.basePath.slice(0, 30));
 
-  constructor (private gameService: GameService) {}
+  constructor(private gameService: GameService) {
+  }
   ngOnInit() {
     //region ---- Generate board logic ----
-    // Spawn cells
-    const redSpawns = [0, 1, 11 + 0, 11 + 1];
-    const blueSpawns = [9, 10, 11 + 9, 11 + 10];
-    const greenSpawns = [11 * 9, 11 * 9 + 1, 11 * 10, 11 * 10 + 1];
-    const yellowSpawns = [11 * 9 + 9, 11 * 9 + 10, 11 * 10 + 9, 11 * 10 + 10];
+
     // Special cells
     const redSpecial = [11 * 4 + 0];
     const blueSpecial = [11 * 6 + 10];
@@ -111,35 +117,35 @@ export class BoardComponent {
 
     // Generate the board
     for (let i = 0; i < 11; i++)
-      for (let j = 0; j < 11; j++){
+      for (let j = 0; j < 11; j++) {
         let color: Color = Color.Neutral;
         let empty: boolean = false;
 
         //region Decide the color of the cell
-        if(
-          redSpawns.concat(this.redHouses).concat(redSpecial)
+        if (
+          this.redSpawns.concat(this.redHouses).concat(redSpecial)
             .includes(i * 11 + j))
           color = Color.Red;
-        else if(
-          blueSpawns.concat(this.blueHouses).concat(blueSpecial)
+        else if (
+          this.blueSpawns.concat(this.blueHouses).concat(blueSpecial)
             .includes(i * 11 + j))
           color = Color.Blue;
-        else if(
-          greenSpawns.concat(this.greenHouses).concat(greenSpecial)
+        else if (
+          this.greenSpawns.concat(this.greenHouses).concat(greenSpecial)
             .includes(i * 11 + j))
           color = Color.Green;
-        else if(
-          yellowSpawns.concat(this.yellowHouses).concat(yellowSpecial)
+        else if (
+          this.yellowSpawns.concat(this.yellowHouses).concat(yellowSpecial)
             .includes(i * 11 + j))
           color = Color.Yellow;
         //endregion
-        if(emptyCells.includes(i * 11 + j))
+        if (emptyCells.includes(i * 11 + j))
           empty = true;
 
         // Check child pawns
-        const childPawns: Pawn[] = this.gameState!.pawns.filter(pawn =>{
+        const childPawns: Pawn[] = this.gameState!.pawns.filter(pawn => {
           let pawnsPath: number[] = [];
-          switch(pawn.color){
+          switch (pawn.color) {
             case Color.Red:
               pawnsPath = this.redPath;
               break;
@@ -153,7 +159,7 @@ export class BoardComponent {
               pawnsPath = this.yellowPath;
               break;
           }
-          const pawnsCoords: {x: number, y: number} = this.cellsTraveledToCoords(pawn.cellsTraveled, pawnsPath);
+          const pawnsCoords: { x: number, y: number } = this.cellsTraveledToCoords(pawn.cellsTraveled, pawnsPath, pawn.spawnCell);
           return pawnsCoords.x === j && pawnsCoords.y === i;
         });
         this.cells.push({x: j, y: i, color: color, empty: empty, childPawns: []});
@@ -164,12 +170,11 @@ export class BoardComponent {
     //endregion
   }
 
-  diceValueChange(value: number){
-    console.log("dice in board component", value);
+  diceValueChange(value: number) {
     this.gameState!.diceValue = value;
   }
 
-  updatePawn(clickedPawn: Pawn){
+  updatePawn(clickedPawn: Pawn) {
     const pawnIndex = this.gameState!.pawns.findIndex(pawn => pawn.color === clickedPawn.color);
 
     this.gameService.movePawn(this.player, this.lobbyId!, clickedPawn)
@@ -183,12 +188,12 @@ export class BoardComponent {
     this.gameState!.pawns[pawnIndex] = clickedPawn;
     this.refreshBoard();
   }
-  refreshBoard(){
+  refreshBoard() {
     // ---- Update pawns positions ----
     this.cells.forEach((cell: Cell) => {
       cell.childPawns = this.gameState!.pawns.filter(pawn => {
         let pawnsPath: number[] = [];
-        switch(pawn.color){
+        switch (pawn.color) {
           case Color.Red:
             pawnsPath = this.redPath;
             break;
@@ -202,21 +207,16 @@ export class BoardComponent {
             pawnsPath = this.yellowPath;
             break;
         }
-        const pawnsCoords: {x: number, y: number} = this.cellsTraveledToCoords(pawn.cellsTraveled, pawnsPath);
+        const pawnsCoords: { x: number, y: number } = this.cellsTraveledToCoords(pawn.cellsTraveled, pawnsPath, pawn.spawnCell);
         return pawnsCoords.x === cell.x && pawnsCoords.y === cell.y;
       });
     });
   }
 
-  cellsTraveledToCoords(cellsTraveled: number, path: number[]): {x: number, y: number}{
-    if(cellsTraveled === 0){
-      // calculate in which spawn the pawn should be
-      return {
-        x: 0,
-        y: 0
-      }
-    }
-    const currentCell = path[cellsTraveled - 1];
+  cellsTraveledToCoords(cellsTraveled: number, path: number[], spawnCell: number): { x: number, y: number } {
+    let currentCell: number = 0;
+    currentCell = cellsTraveled === 0 ? spawnCell : path[cellsTraveled - 1];
+
     const x = currentCell % 11;
     const y = Math.floor(currentCell / 11);
     return {
@@ -224,23 +224,25 @@ export class BoardComponent {
       y: y
     }
   }
-  serverGameStateToClientGameState(serverState: GameStateServer): GameStateClient{
+
+  serverGameStateToClientGameState(serverState: GameStateServer): GameStateClient {
     let clientGameState: GameStateClient = {
       pawns: [],
       currentTurn: serverState.currentTurn,
       diceValue: serverState.diceValue
     };
     [serverState.redTravelled, serverState.blueTravelled, serverState.greenTravelled, serverState.yellowTravelled]
-    .forEach((travelled: number[], index: number) => {
-      travelled.forEach((travelled: number) => {
-        clientGameState.pawns.push({
-            color: (index+1) as Color,
-            path: this.redPath,
-            cellsTraveled: travelled
-          }
-        );
-      })
-    });
+      .forEach((travelled: number[], colorIndex: number) => {
+        travelled.forEach((travelled: number, pawnIndex: number) => {
+          clientGameState.pawns.push({
+              color: (colorIndex + 1) as Color,
+              path: this.redPath,
+              cellsTraveled: travelled,
+              spawnCell: [this.redSpawns, this.blueSpawns, this.greenSpawns, this.yellowSpawns][colorIndex][pawnIndex]
+            }
+          );
+        })
+      });
 
     return clientGameState;
   }

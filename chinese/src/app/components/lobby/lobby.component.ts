@@ -27,10 +27,6 @@ interface JoinLobbyResponse {
   lobby: Lobby;
   player: Player;
 }
-interface ToggleReadyResponse {
-  lobby: Lobby;
-}
-
 @Component({
   selector: 'app-lobby',
   standalone: true,
