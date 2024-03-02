@@ -45,6 +45,16 @@ class GameState {
         return true;
     }
     function movePawn($color, $cellsTraveled){
+        function standardiseCellsTraveled($cellsTraveled, $color){
+            $offsets = [0, 20, 30, 10];
+            $offset = $offsets[$color - 1];
+            if ($cellsTraveled < $offset + $color * 10) {
+                return $cellsTraveled + $offset;
+            }
+            return $cellsTraveled - (40 - $offset);
+        }
+        
+
         $currentTraveled = match(Color::from($color)) {
             Color::RED => $this->redTravelled,
             Color::BLUE => $this->blueTravelled,
@@ -72,8 +82,8 @@ class GameState {
         };
 
         // check for other pawns in the new cell
-        $offsets = [0, 20, 30, 10]; // The offset for each color's spawn cell
         // for each color except the color of the pawn that moved
+        $newCell = standardiseCellsTraveled($newCell, $color);
         for($i = 0; $i < 4; $i++){
             if($i + 1 == $color){
                 continue;
@@ -84,10 +94,12 @@ class GameState {
                 Color::GREEN => $this->greenTravelled,
                 Color::YELLOW => $this->yellowTravelled,
             };
-            $newCellOffset = $offsets[$color - 1];
-            $otherOffset = $offsets[$i];
             for($j = 0; $j < 4; $j++){
-                if($otherTraveled[$j] + $otherOffset == $newCellOffset + $newCell){
+                $otherCell = standardiseCellsTraveled($otherTraveled[$j], $i + 1);
+                // error_log("Checking $otherCell == $newCell");
+                if($otherCell == $newCell){
+                    // $c = $i+1;
+                    // error_log("Pawn of color $c taken by color $color");
                     $otherTraveled[$j] = 0;
                 }
             }
@@ -99,6 +111,6 @@ class GameState {
             };
         }
 
-        // return $this;
+        return $this;
     }
 }

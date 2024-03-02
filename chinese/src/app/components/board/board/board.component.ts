@@ -67,14 +67,14 @@ export class BoardComponent {
   highlightedCell: number | null = null;
 
   redHouses: number[] = [11 * 5 + 1, 11 * 5 + 2, 11 * 5 + 3, 11 * 5 + 4];
-  blueHouses: number[] = [11 * 5 + 6, 11 * 5 + 7, 11 * 5 + 8, 11 * 5 + 9];
+  blueHouses: number[] = [11 * 5 + 6, 11 * 5 + 7, 11 * 5 + 8, 11 * 5 + 9].reverse();
   yellowHouses: number[] = [11 * 1 + 5, 11 * 2 + 5, 11 * 3 + 5, 11 * 4 + 5];
-  greenHouses: number[] = [11 * 6 + 5, 11 * 7 + 5, 11 * 8 + 5, 11 * 9 + 5];
+  greenHouses: number[] = [11 * 6 + 5, 11 * 7 + 5, 11 * 8 + 5, 11 * 9 + 5].reverse();
 
   redSpawns = [0, 1, 11 + 0, 11 + 1];
-  blueSpawns = [9, 10, 11 + 9, 11 + 10];
+  blueSpawns = [11 * 9 + 9, 11 * 9 + 10, 11 * 10 + 9, 11 * 10 + 10];
   greenSpawns = [11 * 9, 11 * 9 + 1, 11 * 10, 11 * 10 + 1];
-  yellowSpawns = [11 * 9 + 9, 11 * 9 + 10, 11 * 10 + 9, 11 * 10 + 10];
+  yellowSpawns = [9, 10, 11 + 9, 11 + 10];
 
   basePath: number[] = [
     4 * 11 + 0, 4 * 11 + 1, 4 * 11 + 2, 4 * 11 + 3, 4 * 11 + 4,
@@ -91,9 +91,9 @@ export class BoardComponent {
     6 * 11 + 0, 5 * 11 + 0
   ];
   redPath: number[] = this.basePath.concat(this.redHouses);
-  yellowPath: number[] = this.basePath.slice(10).concat(this.yellowHouses).concat(this.basePath.slice(0, 10));
-  bluePath: number[] = this.basePath.slice(20).concat(this.blueHouses).concat(this.basePath.slice(0, 20));
-  greenPath: number[] = this.basePath.slice(30).concat(this.greenHouses).concat(this.basePath.slice(0, 30));
+  yellowPath: number[] = this.basePath.slice(10).concat(this.basePath.slice(0, 10)).concat(this.yellowHouses);
+  bluePath: number[] = this.basePath.slice(20).concat(this.basePath.slice(0, 20)).concat(this.blueHouses);
+  greenPath: number[] = this.basePath.slice(30).concat(this.basePath.slice(0, 30)).concat(this.greenHouses);
 
   constructor(private gameService: GameService) {
   }
