@@ -53,19 +53,52 @@ class GameState {
         };
         $newTraveled = [];
         $moved = false; // Only move one pawn, even if there are multiple pawns in the same cell
+        $newCell = 0;
         foreach($currentTraveled as $traveled){
             if($traveled == $cellsTraveled && !$moved){
-                $newTraveled[] = $traveled + $this->diceValue;
+                $newCell = $traveled + $this->diceValue;
+                $newTraveled[] = $newCell;
                 $moved = true;
             } else {
                 $newTraveled[] = $traveled;
             }
         }
+        
         match(Color::from($color)) {
             Color::RED => $this->redTravelled = $newTraveled,
             Color::BLUE => $this->blueTravelled = $newTraveled,
             Color::GREEN => $this->greenTravelled = $newTraveled,
             Color::YELLOW => $this->yellowTravelled = $newTraveled,
         };
+
+        // check for other pawns in the new cell
+        $offsets = [0, 20, 30, 10]; // The offset for each color's spawn cell
+        // for each color except the color of the pawn that moved
+        for($i = 0; $i < 4; $i++){
+            if($i + 1 == $color){
+                continue;
+            }
+            $otherTraveled = match(Color::from($i + 1)) {
+                Color::RED => $this->redTravelled,
+                Color::BLUE => $this->blueTravelled,
+                Color::GREEN => $this->greenTravelled,
+                Color::YELLOW => $this->yellowTravelled,
+            };
+            $newCellOffset = $offsets[$color - 1];
+            $otherOffset = $offsets[$i];
+            for($j = 0; $j < 4; $j++){
+                if($otherTraveled[$j] + $otherOffset == $newCellOffset + $newCell){
+                    $otherTraveled[$j] = 0;
+                }
+            }
+            match(Color::from($i + 1)) {
+                Color::RED => $this->redTravelled = $otherTraveled,
+                Color::BLUE => $this->blueTravelled = $otherTraveled,
+                Color::GREEN => $this->greenTravelled = $otherTraveled,
+                Color::YELLOW => $this->yellowTravelled = $otherTraveled,
+            };
+        }
+
+        // return $this;
     }
 }
