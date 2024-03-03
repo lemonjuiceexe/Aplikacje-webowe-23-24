@@ -118,19 +118,9 @@ class GameState {
             [$this->redTravelled, $this->blueTravelled, $this->greenTravelled, $this->yellowTravelled] 
             as $index=>$traveled
         ){
-            error_log(json_encode($this->redTravelled));
-            error_log($this->redTravelled == [41, 42, 43, 44] ? "true" : "false");
-            error_log(json_encode($this->blueTravelled));
-            error_log($this->blueTravelled == [41, 42, 43, 44] ? "true" : "false");
-            error_log(json_encode($this->greenTravelled));
-            error_log($this->greenTravelled == [41, 42, 43, 44] ? "true" : "false");
-            error_log(json_encode($this->yellowTravelled));
-            error_log($this->yellowTravelled == [41, 42, 43, 44] ? "true" : "false");
-
-            error_log("traveled: " . sort($traveled));
             sort($traveled);
             if($traveled == [41, 42, 43, 44]){
-                return Color::from($index - 1);
+                return Color::from($index + 1);
             } 
         }
         return null;

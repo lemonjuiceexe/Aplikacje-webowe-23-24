@@ -12,7 +12,7 @@ $lobbyFound = false;
 $lobbyJoined;
 while($lobby = $lobbies->fetch_assoc()) {
     $lobbyData = json_decode($lobby["lobby"]);
-    $lobbyObj = new Lobby($lobby["id"], $lobbyData->players, $lobbyData->gameState, $lobbyData->colorsAvailable);
+    $lobbyObj = new Lobby($lobby["id"], $lobbyData->players, $lobbyData->gameState, $lobbyData->lastWinner, $lobbyData->colorsAvailable);
 
     if(count($lobbyObj->players) < 4 && $lobbyObj->gameState == null)
     {

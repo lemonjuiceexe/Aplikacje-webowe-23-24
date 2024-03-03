@@ -17,13 +17,15 @@ class Lobby
     public $id = 0;
     public $players = [];
     public $gameState = null;
+    public $lastWinner = null;
     public $colorsAvailable = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW];
 
-    function __construct($id = 0, $players = [], $gameState = null, $colorsAvailable = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW])
+    function __construct($id = 0, $players = [], $gameState = null, $lastWinner = null, $colorsAvailable = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW])
     {
         $this->id = $id;
         $this->players = $players;
         $this->gameState = $gameState;
+        $this->lastWinner = $lastWinner;
         $this->colorsAvailable = $colorsAvailable;
     }
     function addPlayer($player)

@@ -14,6 +14,7 @@ export interface Lobby{
   id: number;
   players: Player[];
   gameState: GameStateServer | null;
+  lastWinner: Color | null;
 }
 export interface GameStateServer {
   redTravelled: number[];
@@ -26,6 +27,11 @@ export interface GameStateServer {
 interface JoinLobbyResponse {
   lobby: Lobby;
   player: Player;
+}
+interface LobbyStateResponse {
+  players: Player[];
+  gameState: GameStateServer | null;
+  lastWinner: Color | null;
 }
 @Component({
   selector: 'app-lobby',
@@ -59,12 +65,14 @@ export class LobbyComponent {
 
       this.lobbyService.getLobbyState(this.lobby.id)
         .then(response => response.json())
-        .then((data: {players: Player[], gameState: GameStateServer | null}) => {
+        .then((data: LobbyStateResponse) => {
           this.lobby = {
             id: this.lobby!.id,
             players: data.players,
-            gameState: data.gameState
+            gameState: data.gameState,
+            lastWinner: data.lastWinner
           };
+          console.log(this.lobby);
           localStorage.setItem("lobby", JSON.stringify(this.lobby));
           this.gameStarted = this.lobby !== null && this.lobby.gameState !== null;
         });

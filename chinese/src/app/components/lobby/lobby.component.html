@@ -1,7 +1,9 @@
 <div class="wrapper">
   <h1>Hi, {{ player.name }}</h1>
   <h2>You're in lobby {{ lobby?.id }}</h2>
-  <p>game started: {{this.gameStarted}}</p>
+  <ng-container *ngIf="lobby?.lastWinner != null">
+    <h3>Winner of the last game: {{lobby!.lastWinner}}</h3>
+  </ng-container>
   <ng-container *ngIf="!this.gameStarted; else gameStartedBlock">
     <ng-container *ngIf="lobby == null">
       <input [(ngModel)]="player.name" type="text" placeholder="Username">
