@@ -55,12 +55,14 @@ export class BoardComponent {
   @Input() set lobby(lobby: Lobby) {
     this.lobbyId = lobby.id;
     this.gameState = this.serverGameStateToClientGameState(lobby.gameState!);
+    this.colorsInGame = lobby.players.map(player => player.color);
 
     this.refreshBoard();
   }
 
   lobbyId: number | null = null;
   gameState: GameStateClient | null = null;
+  colorsInGame: Color[] = [Color.Red, Color.Blue, Color.Green, Color.Yellow];
 
   cells: Cell[] = [];
 
@@ -144,26 +146,6 @@ export class BoardComponent {
         if (emptyCells.includes(i * 11 + j))
           empty = true;
 
-        // Check child pawns
-        const childPawns: Pawn[] = this.gameState!.pawns.filter(pawn => {
-          let pawnsPath: number[] = [];
-          switch (pawn.color) {
-            case Color.Red:
-              pawnsPath = this.redPath;
-              break;
-            case Color.Blue:
-              pawnsPath = this.bluePath;
-              break;
-            case Color.Green:
-              pawnsPath = this.greenPath;
-              break;
-            case Color.Yellow:
-              pawnsPath = this.yellowPath;
-              break;
-          }
-          const pawnsCoords: { x: number, y: number } = this.cellsTraveledToCoords(pawn.cellsTraveled, pawnsPath, pawn.spawnCell);
-          return pawnsCoords.x === j && pawnsCoords.y === i;
-        });
         this.cells.push({
           x: j,
           y: i,
@@ -214,6 +196,8 @@ export class BoardComponent {
     // ---- Update pawns positions ----
     this.cells.forEach((cell: Cell) => {
       cell.childPawns = this.gameState!.pawns.filter(pawn => {
+        if(!this.colorsInGame.includes(pawn.color)) return false;
+
         let pawnsPath: number[] = [];
         switch (pawn.color) {
           case Color.Red:
