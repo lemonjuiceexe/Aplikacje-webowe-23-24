@@ -59,6 +59,9 @@ class Lobby
 
         // start the game
         $this->gameState = new GameState();
+        $this->gameState->colorsPlaying = array_map(function ($player) {
+            return $player->color;
+        }, $this->players);
         return true;
     }
 }

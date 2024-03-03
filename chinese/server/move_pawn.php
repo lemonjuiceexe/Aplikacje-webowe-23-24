@@ -23,9 +23,15 @@ foreach($lobbyObj->players as $player) {
         //     return;
         // }
 
+        $colorsPlaying = [];
+        foreach($lobbyObj->players as $player) {
+            if($player->color) {
+                array_push($colorsPlaying, $player->color);
+            }
+        }
         $gameStateObj = new GameState
             ($lobbyObj->gameState->redTravelled, $lobbyObj->gameState->blueTravelled, $lobbyObj->gameState->greenTravelled, $lobbyObj->gameState->yellowTravelled, 
-            $lobbyObj->gameState->currentTurn, $lobbyObj->gameState->diceValue);
+            $colorsPlaying, $lobbyObj->gameState->currentTurn, $lobbyObj->gameState->diceValue);
 
         if(!$gameStateObj->isMoveLegal($player->color, $cellsTraveled)){
             http_response_code(403);
