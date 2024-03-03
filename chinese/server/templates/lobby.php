@@ -63,6 +63,7 @@ class Lobby
             return $player->color;
         }, $this->players);
         $this->gameState->currentTurn = $this->gameState->colorsPlaying[0];
+        $this->gameState->roundStartTimestamp = time();
         return true;
     }
 }

@@ -23,6 +23,7 @@ export interface GameStateServer {
   yellowTravelled: number[];
   currentTurn: Color;
   diceValue: number;
+  roundStartTimestamp: number;
 }
 interface JoinLobbyResponse {
   lobby: Lobby;

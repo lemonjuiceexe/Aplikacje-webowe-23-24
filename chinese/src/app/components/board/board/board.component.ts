@@ -34,6 +34,7 @@ export interface GameStateClient {
   pawns: Pawn[];
   currentTurn: Color;
   diceValue: number;
+  roundStartTimestamp: number;
 }
 
 export const backgroundColors: string[] = ["beige", "tomato", "cornflowerblue", "#32de84", "gold"];
@@ -59,6 +60,7 @@ export class BoardComponent {
 
     this.refreshBoard();
   }
+  readonly roundDuration: number = 10;
 
   lobbyId: number | null = null;
   gameState: GameStateClient | null = null;
@@ -67,6 +69,7 @@ export class BoardComponent {
   cells: Cell[] = [];
 
   highlightedCell: number | null = null;
+  roundTimeLeft: number = 10;
 
   redHouses: number[] = [11 * 5 + 1, 11 * 5 + 2, 11 * 5 + 3, 11 * 5 + 4];
   blueHouses: number[] = [11 * 5 + 6, 11 * 5 + 7, 11 * 5 + 8, 11 * 5 + 9].reverse();
@@ -119,6 +122,14 @@ export class BoardComponent {
       11 * 10 + 2, 11 * 10 + 3, 11 * 10 + 7, 11 * 10 + 8
     ];
 
+    // Set interval to refresh the round clock
+    setInterval(() => {
+      if (!this.gameState) return;
+      // PHP timestamp is in seconds, JS timestamp is in milliseconds
+      const timePassed = Math.floor(((new Date().getTime() / 1000) - this.gameState.roundStartTimestamp));
+      this.roundTimeLeft = this.roundDuration - timePassed;
+    }, 900);
+
     // Generate the board
     for (let i = 0; i < 11; i++)
       for (let j = 0; j < 11; j++) {
@@ -161,11 +172,11 @@ export class BoardComponent {
     //endregion
   }
 
-  diceValueChange(value: number) {
+  diceValueChange(value: number): void {
     this.gameState!.diceValue = value;
   }
 
-  updatePawnOnClick(clickedPawn: Pawn) {
+  updatePawnOnClick(clickedPawn: Pawn): void {
     if(clickedPawn.color !== this.player!.color) return;
 
     const pawnIndex = this.gameState!.pawns.findIndex(pawn => pawn.color === clickedPawn.color);
@@ -180,7 +191,7 @@ export class BoardComponent {
       // .then(response => response.text())
       // .then(response => console.log(response));
   }
-  updatePawnOnHover(hoveredPawn: Pawn | null) {
+  updatePawnOnHover(hoveredPawn: Pawn | null): void {
     if(hoveredPawn === null) {
       this.highlightedCell = null;
       this.refreshBoard();
@@ -192,7 +203,7 @@ export class BoardComponent {
     this.refreshBoard();
   }
 
-  refreshBoard() {
+  refreshBoard(): void {
     // ---- Update pawns positions ----
     this.cells.forEach((cell: Cell) => {
       cell.childPawns = this.gameState!.pawns.filter(pawn => {
@@ -239,7 +250,8 @@ export class BoardComponent {
     let clientGameState: GameStateClient = {
       pawns: [],
       currentTurn: serverState.currentTurn,
-      diceValue: serverState.diceValue
+      diceValue: serverState.diceValue,
+      roundStartTimestamp: serverState.roundStartTimestamp
     };
     [serverState.redTravelled, serverState.blueTravelled, serverState.greenTravelled, serverState.yellowTravelled]
       .forEach((travelled: number[], colorIndex: number) => {

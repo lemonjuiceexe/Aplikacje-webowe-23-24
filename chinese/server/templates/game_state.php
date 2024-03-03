@@ -15,10 +15,12 @@ class GameState {
     public $colorsPlaying;
     public $currentTurn;
     public $diceValue;
+    public $roundStartTimestamp;
+    public static $roundDuration = 10;
 
     function __construct ($redTravelled = [0, 7, 0, 0], $blueTravelled = [0, 0, 0, 0], $greenTravelled = [0, 0, 0, 0], $yellowTravelled = [0, 0, 0, 0], 
     $colorsPlaying = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW],    
-    $currentTurn = Color::RED, $diceValue = null) {
+    $currentTurn = Color::RED, $diceValue = null, $roundStartTimestamp = null) {
         $this->redTravelled = $redTravelled;
         $this->blueTravelled = $blueTravelled;
         $this->greenTravelled = $greenTravelled;
@@ -26,6 +28,7 @@ class GameState {
         $this->colorsPlaying = $colorsPlaying;
         $this->currentTurn = $currentTurn;
         $this->diceValue = $diceValue;
+        $this->roundStartTimestamp = $roundStartTimestamp;
     }
 
     function isMoveLegal($color, $cellsTraveled){
@@ -120,6 +123,7 @@ class GameState {
         $index = array_search($this->currentTurn, $this->colorsPlaying);
         $this->currentTurn = $this->colorsPlaying[($index + 1) % count($this->colorsPlaying)];
         $this->diceValue = null;
+        $this->roundStartTimestamp = time();
     }
 
     function checkWin(){
