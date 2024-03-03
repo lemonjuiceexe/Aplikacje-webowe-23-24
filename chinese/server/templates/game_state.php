@@ -8,17 +8,17 @@ enum Color: int {
 }
 
 class GameState {
-    public $redTravelled = [0, 0, 0, 0];
-    public $blueTravelled = [0, 0, 0, 0];
-    public $greenTravelled = [0, 0, 0, 0];
-    public $yellowTravelled = [0, 0, 0, 0];
-    public $colorsPlaying = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW];
-    public $currentTurn = Color::RED;
-    public $diceValue = 0;
+    public $redTravelled;
+    public $blueTravelled;
+    public $greenTravelled;
+    public $yellowTravelled;
+    public $colorsPlaying;
+    public $currentTurn;
+    public $diceValue;
 
     function __construct ($redTravelled = [0, 7, 0, 0], $blueTravelled = [0, 0, 0, 0], $greenTravelled = [0, 0, 0, 0], $yellowTravelled = [0, 0, 0, 0], 
     $colorsPlaying = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW],    
-    $currentTurn = Color::RED, $diceValue = 0) {
+    $currentTurn = Color::RED, $diceValue = null) {
         $this->redTravelled = $redTravelled;
         $this->blueTravelled = $blueTravelled;
         $this->greenTravelled = $greenTravelled;
@@ -112,7 +112,14 @@ class GameState {
             };
         }
 
+        $this->nextTurn();
+
         return $this;
+    }
+    function nextTurn(){
+        $index = array_search($this->currentTurn, $this->colorsPlaying);
+        $this->currentTurn = $this->colorsPlaying[($index + 1) % count($this->colorsPlaying)];
+        $this->diceValue = null;
     }
 
     function checkWin(){

@@ -62,6 +62,7 @@ class Lobby
         $this->gameState->colorsPlaying = array_map(function ($player) {
             return $player->color;
         }, $this->players);
+        $this->gameState->currentTurn = $this->gameState->colorsPlaying[0];
         return true;
     }
 }

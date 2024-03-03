@@ -17,21 +17,15 @@ $lobbyObj = new Lobby($lobby["id"], $lobbyData->players, $lobbyData->gameState, 
 foreach($lobbyObj->players as $player) {
     if($player->secret == $playerSecret) {
         //TODO: Uncomment after testing
-        // if($lobbyObj->gameState->currentTurn != $player->color) {
-        //     http_response_code(403);
-        //     echo "It's not $player->color's turn";
-        //     return;
-        // }
-
-        $colorsPlaying = [];
-        foreach($lobbyObj->players as $player) {
-            if($player->color) {
-                array_push($colorsPlaying, $player->color);
-            }
+        if($lobbyObj->gameState->currentTurn != $player->color) {
+            http_response_code(403);
+            echo "It's not $player->color's turn";
+            return;
         }
+
         $gameStateObj = new GameState
             ($lobbyObj->gameState->redTravelled, $lobbyObj->gameState->blueTravelled, $lobbyObj->gameState->greenTravelled, $lobbyObj->gameState->yellowTravelled, 
-            $colorsPlaying, $lobbyObj->gameState->currentTurn, $lobbyObj->gameState->diceValue);
+            $lobbyObj->gameState->colorsPlaying, $lobbyObj->gameState->currentTurn, $lobbyObj->gameState->diceValue);
 
         if(!$gameStateObj->isMoveLegal($player->color, $cellsTraveled)){
             http_response_code(403);
