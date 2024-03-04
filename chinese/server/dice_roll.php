@@ -38,10 +38,18 @@ foreach($lobbyObj->players as $player) {
         $lobbyObj->gameState->diceValue = $roll;
         $gameStateObj = new GameState($lobbyObj->gameState->redTravelled, $lobbyObj->gameState->blueTravelled, $lobbyObj->gameState->greenTravelled, $lobbyObj->gameState->yellowTravelled, $lobbyObj->gameState->colorsPlaying, $lobbyObj->gameState->currentTurn, $lobbyObj->gameState->diceValue, $lobbyObj->gameState->roundStartTimestamp);
         $connection->query("UPDATE lobbies SET lobby='".json_encode($lobbyObj)."' WHERE id=".$lobbyId);
+        $legalPawns = $gameStateObj->getLegalPawns();
         echo json_encode([
             "roll" => $roll,
-            "legalPawns" => $gameStateObj->getLegalPawns()
+            "legalPawns" => $legalPawns
         ]);
+        // if there are no legal moves
+        if(count($legalPawns) == 0){
+            sleep(2);
+            $gameStateObj->nextTurn();
+            $lobbyObj->gameState = $gameStateObj;
+            $connection->query("UPDATE lobbies SET lobby='".json_encode($lobbyObj)."' WHERE id=".$lobbyId);
+        }
         $connection->close();
         return;
     }

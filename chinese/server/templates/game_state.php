@@ -18,7 +18,7 @@ class GameState {
     public $roundStartTimestamp;
     public static $roundDuration = 60;
 
-    function __construct ($redTravelled = [0, 7, 0, 0], $blueTravelled = [0, 0, 0, 0], $greenTravelled = [0, 0, 0, 0], $yellowTravelled = [0, 0, 0, 0], 
+    function __construct ($redTravelled = [0, 0, 0, 0], $blueTravelled = [0, 0, 0, 0], $greenTravelled = [0, 0, 0, 0], $yellowTravelled = [0, 0, 0, 0], 
     $colorsPlaying = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW],    
     $currentTurn = Color::RED, $diceValue = null, $roundStartTimestamp = null) {
         $this->redTravelled = $redTravelled;
