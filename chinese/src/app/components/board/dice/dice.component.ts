@@ -3,6 +3,11 @@ import {GameService} from "../../../services/game.service";
 import {Player} from "../../lobby/lobby.component";
 import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 
+interface DiceRollResponse {
+  roll: number;
+  legalPawns: number[];
+}
+
 @Component({
   selector: 'app-dice',
   standalone: true,
@@ -20,6 +25,8 @@ export class DiceComponent {
 
   @Input() diceValue: number = 1;
   @Output() diceValueChange = new EventEmitter<number>();
+  // The cellsTraveled values of the pawns that can be moved
+  @Output() legalPawns = new EventEmitter<number[]>();
 
   spritePaths: string[] = [
     'assets/dice/1.png',
@@ -39,10 +46,10 @@ export class DiceComponent {
 
     this.gameService.rollDice(this.player, this.lobbyId)
       .then(response => response.json())
-      .then((roll: number) => {
-        console.log('dice roll response:', roll);
-        this.diceValue = roll;
-        this.diceValueChange.emit(roll);
+      .then((data: DiceRollResponse) => {
+        this.diceValue = data.roll;
+        this.diceValueChange.emit(data.roll);
+        this.legalPawns.emit(data.legalPawns);
       });
       // .then(response => response.text())
       // .then((text: string) => {

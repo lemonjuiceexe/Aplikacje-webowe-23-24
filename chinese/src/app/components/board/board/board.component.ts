@@ -28,6 +28,7 @@ export interface Pawn {
   path: number[];
   cellsTraveled: number;
   spawnCell: number;
+  highlighted: boolean;
 }
 
 export interface GameStateClient {
@@ -60,7 +61,7 @@ export class BoardComponent {
 
     this.refreshBoard();
   }
-  readonly roundDuration: number = 10;
+  readonly roundDuration: number = 60;
 
   lobbyId: number | null = null;
   gameState: GameStateClient | null = null;
@@ -69,6 +70,7 @@ export class BoardComponent {
   cells: Cell[] = [];
 
   highlightedCell: number | null = null;
+  highlightedPawns: Pawn[] = [];
   roundTimeLeft: number = 10;
 
   redHouses: number[] = [11 * 5 + 1, 11 * 5 + 2, 11 * 5 + 3, 11 * 5 + 4];
@@ -100,11 +102,9 @@ export class BoardComponent {
   bluePath: number[] = this.basePath.slice(20).concat(this.basePath.slice(0, 20)).concat(this.blueHouses);
   greenPath: number[] = this.basePath.slice(30).concat(this.basePath.slice(0, 30)).concat(this.greenHouses);
 
-  constructor(private gameService: GameService) {
-  }
+  constructor(private gameService: GameService) {}
   ngOnInit() {
     //region ---- Generate board logic ----
-
     // Special cells
     const redSpecial = [11 * 4 + 0];
     const blueSpecial = [11 * 6 + 10];
@@ -168,12 +168,23 @@ export class BoardComponent {
 
         this.refreshBoard();
       }
-
     //endregion
   }
 
   diceValueChange(value: number): void {
     this.gameState!.diceValue = value;
+  }
+  highlightLegalPawnsOnChange(pawnsTraveledValues: number[]): void {
+    console.log(pawnsTraveledValues);
+    this.gameState!.pawns = this.gameState!.pawns
+      .filter((pawn: Pawn) => pawn.color === this.player.color)
+      .map((pawn: Pawn) => {
+        return {
+          ...pawn,
+          highlighted: pawnsTraveledValues.includes(pawn.cellsTraveled)
+        }
+      });
+    this.highlightedPawns = this.gameState!.pawns.filter(pawn => pawn.highlighted);
   }
 
   updatePawnOnClick(clickedPawn: Pawn): void {
@@ -190,6 +201,7 @@ export class BoardComponent {
       });
       // .then(response => response.text())
       // .then(response => console.log(response));
+    this.highlightedPawns = [];
   }
   updatePawnOnHover(hoveredPawn: Pawn | null): void {
     if(hoveredPawn === null) {
@@ -260,7 +272,8 @@ export class BoardComponent {
               color: (colorIndex + 1) as Color,
               path: [this.redPath, this.bluePath, this.greenPath, this.yellowPath][colorIndex],
               cellsTraveled: travelled,
-              spawnCell: [this.redSpawns, this.blueSpawns, this.greenSpawns, this.yellowSpawns][colorIndex][pawnIndex]
+              spawnCell: [this.redSpawns, this.blueSpawns, this.greenSpawns, this.yellowSpawns][colorIndex][pawnIndex],
+              highlighted: this.highlightedPawns.some(pawn => pawn.color === (colorIndex + 1) && pawn.cellsTraveled === travelled)
             }
           );
         })

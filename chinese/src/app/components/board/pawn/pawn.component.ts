@@ -9,7 +9,7 @@ import {Color, backgroundColors, BoardComponent, Pawn} from "../board/board.comp
   styleUrl: './pawn.component.css'
 })
 export class PawnComponent {
-  @Input() pawn: Pawn = {color: Color.Neutral, path: [], cellsTraveled: 0, spawnCell: 0};
+  @Input() pawn: Pawn = {color: Color.Neutral, path: [], cellsTraveled: 0, spawnCell: 0, highlighted: false};
   backgroundColor: string = backgroundColors[0];
 
   @Output() pawnClicked = new EventEmitter<Pawn>();
@@ -17,6 +17,11 @@ export class PawnComponent {
 
   ngOnInit(){
     this.backgroundColor = backgroundColors[this.pawn.color];
+    setInterval(() => {
+      if(!this.pawn.highlighted)
+        return;
+      this.backgroundColor = this.backgroundColor === backgroundColors[this.pawn.color] ? "white" : backgroundColors[this.pawn.color];
+    }, 500);
   }
 
   onClick(){

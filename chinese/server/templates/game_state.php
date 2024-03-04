@@ -16,7 +16,7 @@ class GameState {
     public $currentTurn;
     public $diceValue;
     public $roundStartTimestamp;
-    public static $roundDuration = 10;
+    public static $roundDuration = 60;
 
     function __construct ($redTravelled = [0, 7, 0, 0], $blueTravelled = [0, 0, 0, 0], $greenTravelled = [0, 0, 0, 0], $yellowTravelled = [0, 0, 0, 0], 
     $colorsPlaying = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW],    
@@ -48,6 +48,23 @@ class GameState {
             return false; // This pawn would move past the end of the board
         }
         return true;
+    }
+    // Returns an array of cellsTraveled of pawns that are legal to move with the current dice value
+    function getLegalPawns(){
+        // this method should not modify the game state
+        $legalPawns = [];
+        $currentTraveled = match(Color::from($this->currentTurn)) {
+            Color::RED => $this->redTravelled,
+            Color::BLUE => $this->blueTravelled,
+            Color::GREEN => $this->greenTravelled,
+            Color::YELLOW => $this->yellowTravelled,
+        };
+        foreach($currentTraveled as $traveled){
+            if($this->isMoveLegal($this->currentTurn, $traveled)){
+                $legalPawns[] = $traveled;
+            }
+        }
+        return $legalPawns;
     }
     function movePawn($color, $cellsTraveled){
         function standardiseCellsTraveled($cellsTraveled, $color){
