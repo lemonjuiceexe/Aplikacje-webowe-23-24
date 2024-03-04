@@ -4,7 +4,7 @@
   [style.display]="display"
   [style.box-shadow]="shadow"
 >
-  {{highlighted ? "AAA" : (y * 11 + x)}}
+  {{(y * 11 + x)}}
   <div *ngFor="let pawn of childPawns" (click)="onPawnClick(pawn)">
     <app-pawn
       [pawn]="pawn"

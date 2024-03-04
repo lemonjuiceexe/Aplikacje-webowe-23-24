@@ -210,8 +210,11 @@ export class BoardComponent {
       return;
     }
     if(hoveredPawn.color !== this.player!.color) return;
+    if(!this.highlightedPawns.some((pawn: Pawn) =>
+      pawn.color === hoveredPawn.color && pawn.cellsTraveled === hoveredPawn.cellsTraveled)) return;
 
-    this.highlightedCell = hoveredPawn.path[hoveredPawn.cellsTraveled + this.gameState!.diceValue - 1];
+    const nextCellIndex = hoveredPawn.cellsTraveled === 0 ? 1 : hoveredPawn.cellsTraveled + this.gameState!.diceValue;
+    this.highlightedCell = hoveredPawn.path[nextCellIndex - 1];
     this.refreshBoard();
   }
 

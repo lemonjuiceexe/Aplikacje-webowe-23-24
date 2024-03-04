@@ -34,7 +34,7 @@ if($lobbyObj->gameState->diceValue != null) {
 
 foreach($lobbyObj->players as $player) {
     if($player->secret == $playerSecret) {
-        $roll = 6;
+        $roll = rand(1, 6);
         $lobbyObj->gameState->diceValue = $roll;
         $gameStateObj = new GameState($lobbyObj->gameState->redTravelled, $lobbyObj->gameState->blueTravelled, $lobbyObj->gameState->greenTravelled, $lobbyObj->gameState->yellowTravelled, $lobbyObj->gameState->colorsPlaying, $lobbyObj->gameState->currentTurn, $lobbyObj->gameState->diceValue, $lobbyObj->gameState->roundStartTimestamp);
         $connection->query("UPDATE lobbies SET lobby='".json_encode($lobbyObj)."' WHERE id=".$lobbyId);

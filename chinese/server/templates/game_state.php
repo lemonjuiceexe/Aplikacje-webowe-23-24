@@ -47,6 +47,9 @@ class GameState {
         if($cellsTraveled + $this->diceValue > 44){
             return false; // This pawn would move past the end of the board
         }
+        if($cellsTraveled == 0 && !($this->diceValue == 1 || $this->diceValue == 6)){
+            return false; // This pawn is still in the spawn and the dice value is not 1 or 6
+        }
         return true;
     }
     // Returns an array of cellsTraveled of pawns that are legal to move with the current dice value
@@ -90,7 +93,12 @@ class GameState {
         $newCell = 0;
         foreach($currentTraveled as $traveled){
             if($traveled == $cellsTraveled && !$moved){
-                $newCell = $traveled + $this->diceValue;
+                // move normally unless the pawn is in the spawn
+                if($traveled == 0){
+                    $newCell = 1;
+                } else {
+                    $newCell = $traveled + $this->diceValue;
+                }
                 $newTraveled[] = $newCell;
                 $moved = true;
             } else {
