@@ -60,6 +60,13 @@ export class LobbyComponent {
   constructor(private lobbyService: LobbyService) { }
 
   ngOnInit() {
+    if(localStorage.getItem("lobby") !== null){
+      this.lobby = JSON.parse(localStorage.getItem("lobby")!);
+    }
+    if(localStorage.getItem("player") !== null){
+      this.player = JSON.parse(localStorage.getItem("player")!);
+    }
+
     // Every 3 seconds fetch the current game state from the server
     setInterval(() => {
       if(!this.lobby) return;
@@ -75,6 +82,7 @@ export class LobbyComponent {
           };
           console.log(this.lobby);
           localStorage.setItem("lobby", JSON.stringify(this.lobby));
+          localStorage.setItem("player", JSON.stringify(this.player));
           this.gameStarted = this.lobby !== null && this.lobby.gameState !== null;
         });
     }, 3000);
@@ -117,5 +125,9 @@ export class LobbyComponent {
       });
       // .then(text => text.text())
       // .then(text => console.log(text));
+  }
+  leaveLobby($event: MouseEvent) {
+    localStorage.clear();
+    window.location.reload();
   }
 }

@@ -4,6 +4,9 @@
   <ng-container *ngIf="lobby?.lastWinner != null">
     <h3>Winner of the last game: {{lobby!.lastWinner}}</h3>
   </ng-container>
+  <ng-container *ngIf="lobby !== null">
+    <button (click)="leaveLobby($event)">Leave lobby</button>
+  </ng-container>
   <ng-container *ngIf="!this.gameStarted; else gameStartedBlock">
     <ng-container *ngIf="lobby == null">
       <input [(ngModel)]="player.name" type="text" placeholder="Username">
