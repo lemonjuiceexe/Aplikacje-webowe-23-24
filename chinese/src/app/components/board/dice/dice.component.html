@@ -1,13 +1,19 @@
 <div class="wrapper" (click)="diceClick()">
-  <ng-container *ngFor="let idx of [0, 1, 2, 3, 4, 5]">
-    <img
-      ngSrc="assets/dice/{{idx + 1}}.png"
-      width="50"
-      height="50"
-      alt="Dice value {{idx+1}}"
-      style="{{diceValue === idx + 1 ? 'display: block' : 'display: none'}}"
-    >
-  </ng-container>
-  <p>value: {{diceValue}}</p>
-  <p>click me to roll</p>
+  <div class="clicker">
+    <ng-container *ngFor="let idx of [0, 1, 2, 3, 4, 5]">
+      <img
+        ngSrc="assets/dice/{{idx + 1}}.png"
+        width="50"
+        height="50"
+        alt="Dice value {{idx+1}}"
+        style="{{diceValue === idx + 1 ? 'display: block' : 'display: none'}}"
+      >
+    </ng-container>
+    <p>value: {{ diceValue }}</p>
+    <p>click me to roll</p>
+  </div>
+  <select [(ngModel)]="language">
+    <option>polski</option>
+    <option>english</option>
+  </select>
 </div>

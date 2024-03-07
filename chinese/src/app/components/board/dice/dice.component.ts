@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {GameService} from "../../../services/game.service";
 import {Player} from "../../lobby/lobby.component";
 import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
+import {FormsModule} from "@angular/forms";
 
 interface DiceRollResponse {
   roll: number;
@@ -14,7 +15,8 @@ interface DiceRollResponse {
   imports: [
     NgIf,
     NgOptimizedImage,
-    NgForOf
+    NgForOf,
+    FormsModule
   ],
   templateUrl: './dice.component.html',
   styleUrl: './dice.component.css'
@@ -36,6 +38,7 @@ export class DiceComponent {
     'assets/dice/5.png',
     'assets/dice/6.png'
   ];
+  language: string = 'english';
 
   constructor(private gameService: GameService) { }
   diceClick() {
@@ -50,6 +53,12 @@ export class DiceComponent {
         this.diceValue = data.roll;
         this.diceValueChange.emit(data.roll);
         this.legalPawns.emit(data.legalPawns);
+
+        let tts = new SpeechSynthesisUtterance("   " + data.roll.toString());
+        tts.voice = speechSynthesis.getVoices()[49];
+        tts.lang = {english: 'en-UK', polski: 'pl-PL'}[this.language]!;
+        console.log(tts.lang);
+        window.speechSynthesis.speak(tts);
       });
       // .then(response => response.text())
       // .then((text: string) => {
