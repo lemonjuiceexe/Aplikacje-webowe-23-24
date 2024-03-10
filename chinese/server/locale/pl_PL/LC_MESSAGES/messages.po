@@ -1,0 +1,8 @@
+msgid "Hi"
+msgstr "Cześć"
+msgid "You're in lobby"
+msgstr "Jesteś w pokoju"
+msgid "Username"
+msgstr "Nazwa użytkownika"
+msgid "Join lobby"
+msgstr "Dołącz do pokoju"

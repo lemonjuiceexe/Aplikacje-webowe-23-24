@@ -25,10 +25,12 @@ export class DiceComponent {
   @Input() player!: Player;
   @Input() lobbyId!: number | null;
 
+  @Input() words: any;
   @Input() diceValue: number = 1;
   @Output() diceValueChange = new EventEmitter<number>();
   // The cellsTraveled values of the pawns that can be moved
   @Output() legalPawns = new EventEmitter<number[]>();
+  @Output() languageChange = new EventEmitter<string>();
 
   spritePaths: string[] = [
     'assets/dice/1.png',
@@ -42,6 +44,7 @@ export class DiceComponent {
 
   constructor(private gameService: GameService) { }
   diceClick() {
+    this.languageChange.emit(this.language);
     if (this.lobbyId === null) {
       console.error("Can't roll the dice: lobbyId is null");
       return;

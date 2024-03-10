@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CellComponent} from "../cell/cell.component";
 import {CommonModule} from "@angular/common";
 import {PawnComponent} from "../pawn/pawn.component";
@@ -61,6 +61,8 @@ export class BoardComponent {
 
     this.refreshBoard();
   }
+  @Input() words: any;
+  @Output() languageChange = new EventEmitter<string>();
   readonly roundDuration: number = 60;
 
   lobbyId: number | null = null;
@@ -173,6 +175,9 @@ export class BoardComponent {
 
   diceValueChange(value: number): void {
     this.gameState!.diceValue = value;
+  }
+  languageChangeHandler(language: string): void {
+    this.languageChange.emit(language);
   }
   highlightLegalPawnsOnChange(pawnsTraveledValues: number[]): void {
     console.log(pawnsTraveledValues);

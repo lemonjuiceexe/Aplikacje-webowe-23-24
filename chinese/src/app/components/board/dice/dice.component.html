@@ -9,8 +9,8 @@
         style="{{diceValue === idx + 1 ? 'display: block' : 'display: none'}}"
       >
     </ng-container>
-    <p>value: {{ diceValue }}</p>
-    <p>click me to roll</p>
+    <p>{{ words["Value"] }}: {{ diceValue }}</p>
+    <p>{{ words["Click me to roll"] }}</p>
   </div>
   <select [(ngModel)]="language">
     <option>polski</option>

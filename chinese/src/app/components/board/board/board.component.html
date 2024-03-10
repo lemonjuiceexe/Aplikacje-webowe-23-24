@@ -1,4 +1,4 @@
-<p>Time left: {{roundTimeLeft}}</p><br>
+<p>{{ words["Time left"] }}: {{roundTimeLeft}}</p><br>
 <div class="wrapper">
   <div *ngFor="let cell of cells; index as i">
     <app-cell *ngIf="!cell.empty else emptyCell"
@@ -14,8 +14,11 @@
     </ng-template>
   </div>
   <app-dice (diceValueChange)="diceValueChange($event)"
+            (languageChange)="languageChangeHandler($event)"
             (legalPawns)="highlightLegalPawnsOnChange($event)"
             [diceValue]="gameState!.diceValue"
             [player]="player"
-            [lobbyId]="lobbyId" />
+            [lobbyId]="lobbyId"
+            [words]="words"
+  />
 </div>

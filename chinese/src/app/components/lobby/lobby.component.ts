@@ -56,6 +56,8 @@ export class LobbyComponent {
   };
 
   gameStarted: boolean = this.lobby !== null && this.lobby.gameState !== null;
+  words: any = {};
+  currentLanguage: string = "en_US";
 
   constructor(private lobbyService: LobbyService) { }
 
@@ -66,6 +68,13 @@ export class LobbyComponent {
     if(localStorage.getItem("player") !== null){
       this.player = JSON.parse(localStorage.getItem("player")!);
     }
+
+    this.lobbyService.getWords(this.currentLanguage)
+      .then(response => response.json())
+      .then((data: Object) => {
+        this.words = data;
+        console.log(data);
+      });
 
     // Every 3 seconds fetch the current game state from the server
     setInterval(() => {
@@ -86,6 +95,17 @@ export class LobbyComponent {
           this.gameStarted = this.lobby !== null && this.lobby.gameState !== null;
         });
     }, 3000);
+  }
+
+  onLanguageChange(language: string) {
+    console.log("Language changed to: ", language);
+    this.currentLanguage = language === "english" ? "en_US" : "pl_PL";
+    this.lobbyService.getWords(this.currentLanguage)
+      .then(response => response.json())
+      .then((data: Object) => {
+        this.words = data;
+        console.log(data);
+      });
   }
 
   joinLobby(e: Event) {
