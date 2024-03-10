@@ -9,11 +9,11 @@ export class LobbyService {
   constructor() {
   }
   joinLobby(playerName: string) {
-    return fetch(`http://127.0.0.1/chinese/server/join_lobby.php?playerName=${playerName}`, {
+    return fetch(`/server/join_lobby.php?playerName=${playerName}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "http://127.0.0.1",
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Credentials",
       }
     });
@@ -22,10 +22,10 @@ export class LobbyService {
     const formData = new FormData();
     formData.append("playerSecret", player.secret);
     formData.append("lobbyId", lobby.id.toString());
-    return fetch(`http://127.0.0.1/chinese/server/toggle_ready.php`, {
+    return fetch(`/server/toggle_ready.php`, {
       method: "POST",
       headers: {
-        "Access-Control-Allow-Origin": "http://localhost",
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Credentials",
       },
       body: formData
@@ -33,10 +33,10 @@ export class LobbyService {
   }
 
   getLobbyState(lobbyId: number) {
-    return fetch(`http://127.0.0.1/chinese/server/get_lobby_state.php?lobbyId=${lobbyId}`, {
+    return fetch(`/server/get_lobby_state.php?lobbyId=${lobbyId}`, {
       method: "GET",
       headers: {
-        "Access-Control-Allow-Origin": "http://localhost",
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Credentials",
       }
     });

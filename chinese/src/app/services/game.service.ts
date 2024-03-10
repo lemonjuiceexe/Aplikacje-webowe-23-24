@@ -13,10 +13,10 @@ export class GameService {
     const formData = new FormData();
     formData.append("playerSecret", player.secret);
     formData.append("lobbyId", lobbyId.toString());
-    return fetch("http://127.0.0.1/chinese/server/dice_roll.php", {
+    return fetch("/server/dice_roll.php", {
       method: "POST",
       headers: {
-        "Access-Control-Allow-Origin": "http://localhost",
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Credentials",
       },
       body: formData
@@ -29,10 +29,10 @@ export class GameService {
     formData.append("playerSecret", player.secret);
     formData.append("lobbyId", lobbyId.toString());
     formData.append("cellsTraveled", pawn.cellsTraveled.toString());
-    return fetch("http://127.0.0.1/chinese/server/move_pawn.php", {
+    return fetch("/server/move_pawn.php", {
       method: "POST",
       headers: {
-        "Access-Control-Allow-Origin": "http://localhost",
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Credentials",
       },
       body: formData

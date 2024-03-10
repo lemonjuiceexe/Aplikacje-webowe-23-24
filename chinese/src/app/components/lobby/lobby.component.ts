@@ -127,6 +127,7 @@ export class LobbyComponent {
       // .then(text => console.log(text));
   }
   leaveLobby($event: MouseEvent) {
+    //TODO: probably should delete the player from the lobby in the db
     localStorage.clear();
     window.location.reload();
   }
