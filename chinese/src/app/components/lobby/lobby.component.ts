@@ -69,12 +69,7 @@ export class LobbyComponent {
       this.player = JSON.parse(localStorage.getItem("player")!);
     }
 
-    this.lobbyService.getWords(this.currentLanguage)
-      .then(response => response.json())
-      .then((data: Object) => {
-        this.words = data;
-        console.log(data);
-      });
+    this.onLanguageChange("english");
 
     // Every 3 seconds fetch the current game state from the server
     setInterval(() => {
@@ -94,7 +89,7 @@ export class LobbyComponent {
           localStorage.setItem("player", JSON.stringify(this.player));
           this.gameStarted = this.lobby !== null && this.lobby.gameState !== null;
         });
-    }, 3000);
+    }, 1500);
   }
 
   onLanguageChange(language: string) {
@@ -149,6 +144,21 @@ export class LobbyComponent {
   leaveLobby($event: MouseEvent) {
     //TODO: probably should delete the player from the lobby in the db
     localStorage.clear();
-    window.location.reload();
+    window.location.assign("/niwicki");
+  }
+
+  colorToString(color: Color): string{
+    switch (color){
+      case Color.Red:
+        return "red";
+      case Color.Blue:
+        return "blue";
+      case Color.Green:
+        return "green";
+      case Color.Yellow:
+        return "yellow";
+      default:
+        return "";
+    }
   }
 }

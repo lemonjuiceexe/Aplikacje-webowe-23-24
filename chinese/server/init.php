@@ -2,7 +2,7 @@
 include "templates/game_state.php";
 include "templates/lobby.php";
 
-Header("Access-Control-Allow-Origin: http://localhost:4200");
+Header("Access-Control-Allow-Origin: https://localhost");
 Header("Access-Control-Allow-Credentials: true");
 Header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Credentials");
 Header("Content-Type: application/json");

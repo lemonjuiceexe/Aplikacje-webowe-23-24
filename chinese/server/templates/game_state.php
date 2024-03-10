@@ -47,6 +47,9 @@ class GameState {
         if($cellsTraveled + $this->diceValue > 44){
             return false; // This pawn would move past the end of the board
         }
+	if(in_array($cellsTraveled + $this->diceValue, [41, 42, 43, 44]) && in_array($cellsTraveled + $this->diceValue, $currentTraveled)){
+            return false; // Pawns can't stack on top of each other in their houses
+        }
         if($cellsTraveled == 0 && !($this->diceValue == 1 || $this->diceValue == 6)){
             return false; // This pawn is still in the spawn and the dice value is not 1 or 6
         }

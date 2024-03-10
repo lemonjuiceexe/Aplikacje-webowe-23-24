@@ -15,13 +15,14 @@ export class PawnComponent {
   @Output() pawnClicked = new EventEmitter<Pawn>();
   @Output() pawnHovered = new EventEmitter<Pawn | null>();
 
+  highlightInterval = setInterval(() => {
+    if(!this.pawn.highlighted)
+      return;
+    this.backgroundColor = this.backgroundColor === backgroundColors[this.pawn.color] ? "white" : backgroundColors[this.pawn.color];
+  }, 500);
+
   ngOnInit(){
     this.backgroundColor = backgroundColors[this.pawn.color];
-    setInterval(() => {
-      if(!this.pawn.highlighted)
-        return;
-      this.backgroundColor = this.backgroundColor === backgroundColors[this.pawn.color] ? "white" : backgroundColors[this.pawn.color];
-    }, 500);
   }
 
   onClick(){

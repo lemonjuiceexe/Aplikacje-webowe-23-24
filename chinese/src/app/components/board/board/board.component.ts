@@ -73,7 +73,7 @@ export class BoardComponent {
 
   highlightedCell: number | null = null;
   highlightedPawns: Pawn[] = [];
-  roundTimeLeft: number = 10;
+  roundTimeLeft: number = 60;
 
   redHouses: number[] = [11 * 5 + 1, 11 * 5 + 2, 11 * 5 + 3, 11 * 5 + 4];
   blueHouses: number[] = [11 * 5 + 6, 11 * 5 + 7, 11 * 5 + 8, 11 * 5 + 9].reverse();

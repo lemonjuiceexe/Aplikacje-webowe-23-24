@@ -2,7 +2,7 @@
   <h1>{{ words["Hi"]! }}, {{ player.name }}</h1>
   <h2>{{ words["You're in lobby"] }} {{ lobby?.id }}</h2>
   <ng-container *ngIf="lobby?.lastWinner != null">
-    <h3>Winner of the last game: {{lobby!.lastWinner}}</h3>
+    <h3>Winner of the last game: {{colorToString(lobby!.lastWinner!)}}</h3>
   </ng-container>
   <ng-container *ngIf="lobby !== null">
     <button (click)="leaveLobby($event)">{{ words["Leave lobby"] }}</button>
