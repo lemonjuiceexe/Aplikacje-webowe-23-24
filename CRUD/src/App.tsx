@@ -5,9 +5,6 @@ import Card from "./components/ui/Card.jsx";
 function App() {
     return (
         <>
-            <div className="btn btn-primary">
-                asdas
-            </div>
             <h1 className="
                 text-3xl
                 font-bold

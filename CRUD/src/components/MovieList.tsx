@@ -9,6 +9,10 @@ export interface Movie {
     count: number;
     rating: number;
 }
+export interface Director {
+    id: number;
+    name: string;
+}
 
 const movies: Movie[] = [
     {
@@ -39,6 +43,20 @@ const movies: Movie[] = [
         rating: 4
     }
 ];
+const directors: Director[] = [
+    {
+        id: 1,
+        name: "Frank Darabont"
+    },
+    {
+        id: 2,
+        name: "Francis Ford Coppola"
+    },
+    {
+        id: 3,
+        name: "Christopher Nolan"
+    }
+];
 
 export default function MovieList() {
     const columns: string[] = ["id", "Title", "Director", "Length", "Rating", "Count"];
@@ -48,14 +66,17 @@ export default function MovieList() {
                 <thead>
                     <tr>
                         {columns.map((column) => (<th>{column}</th>))}
-                        {/* edit and delete */}
+                        {/* edit and delete columns */}
                         <th></th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {movies.map((movie) => (
-                        <MovieItem movie={movie} editing={false}/>
+                        <MovieItem
+                            movie={movie}
+                            directors={directors}
+                            editing={false}/>
                     ))}
                 </tbody>
             </table>

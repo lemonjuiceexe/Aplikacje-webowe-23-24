@@ -1,9 +1,12 @@
-import {Movie} from "./MovieList.tsx";
+import {Director, Movie} from "./MovieList.tsx";
 import {useState} from "react";
 
-export default function MovieItem(props: {movie: Movie, editing: boolean}){
+export default function MovieItem(props: {movie: Movie, directors: Director[], editing: boolean}){
     const [editing, setEditing] = useState(props.editing);
     const [movie, setMovie] = useState(props.movie);
+    const [director, setDirector] = useState(
+        props.directors.filter(director => director.id === movie.director_id)[0]
+    );
 
     function editClickHandler() {
         setEditing(prev => !prev);
@@ -26,14 +29,14 @@ export default function MovieItem(props: {movie: Movie, editing: boolean}){
                 {!editing ?
                     (<><span className={"font-bold"}>{movie.title}</span> ({movie.year})</>) :
                     (<>
-                        <input className={"input input-sm mx-1"}
+                        <input className={"input input-bordered input-sm mx-1"}
                                type={"text"}
                                value={movie.title}
                                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                                    movieEditHandler(event, "title")
                                }
                         />
-                        <input className={"input input-sm mx-1"}
+                        <input className={"input input-bordered input-sm mx-1"}
                                type={"number"}
                                min={"1900"} max={"2024"}
                                value={movie.year}
@@ -45,7 +48,13 @@ export default function MovieItem(props: {movie: Movie, editing: boolean}){
                 }
             </td>
             <td>
-                {movie.director_id}
+                {!editing ? (director.name) : (
+                    <select className={"select select-bordered select-sm"}>
+                        {props.directors.map(director => (
+                            <option value={director.id}>{director.name}</option>
+                        ))})
+                    </select>
+                )}
             </td>
             <td>
                 {movie.length}
@@ -60,7 +69,7 @@ export default function MovieItem(props: {movie: Movie, editing: boolean}){
             <td>
                 <button
                     onClick={editClickHandler}
-                    className={"btn btn-sm btn-warning"}>{!editing ? "Edit" : "Save"}
+                    className={`btn btn-sm ${!editing ? "btn-warning" : "btn-success text-white"}`}>{!editing ? "Edit" : "Save"}
                 </button>
             </td>
             <td>
