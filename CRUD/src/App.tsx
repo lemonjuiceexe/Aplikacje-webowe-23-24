@@ -1,8 +1,5 @@
-import { useState } from "react"
-import reactLogo from "./assets/react.svg"
-import viteLogo from "/vite.svg"
 import "./App.css"
-import List from "./components/List.jsx";
+import MovieList from "./components/MovieList.tsx";
 import Card from "./components/ui/Card.jsx";
 
 function App() {
@@ -21,10 +18,10 @@ function App() {
                 mb-6
                 p-4
             ">
-                Movies
+               Motion pictures
             </h1>
             <Card>
-                <List/>
+                <MovieList/>
             </Card>
         </>
     );
