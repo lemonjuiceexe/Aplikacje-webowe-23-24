@@ -12,7 +12,11 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
     function editClickHandler() {
         setEditing(prev => !prev);
     }
-    function movieEditHandler(event: React.ChangeEvent<HTMLInputElement>, keyToEdit: string, value?: number | string) {
+    function movieEditHandler(event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>, keyToEdit: string, value?: number | string) {
+        if(keyToEdit === "director_id") {
+            const director = props.directors.filter(director => director.id === parseInt(event.target.value))[0];
+            setDirector(director);
+        }
         setMovie(prev => {
             return {
                 ...prev,
@@ -62,7 +66,12 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
             </td>
             <td>
                 {!editing ? (director.name) : (
-                    <select className={"select select-bordered select-sm w-32"}>
+                    <select className={"select select-bordered select-sm w-48"}
+                            value={director.id}
+                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+                                movieEditHandler(event, "director_id")
+                            }
+                    >
                         {props.directors.map(director => (
                             <option value={director.id}>{director.name}</option>
                         ))})
@@ -107,7 +116,7 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
             </td>
             <td>
             {!editing ? (movie.count) : (
-                    <input className={"input input-bordered input-sm w-10"}
+                    <input className={"input input-bordered input-sm w-14"}
                            type={"number"}
                            min={"0"}
                            value={movie.count}
