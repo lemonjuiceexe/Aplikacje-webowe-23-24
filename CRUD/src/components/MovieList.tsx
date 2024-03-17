@@ -22,7 +22,7 @@ const movies: Movie[] = [
         length: "2:22:21",
         director_id: 1,
         count: 8,
-        rating: 4.5
+        rating: 4
     },
     {
         id: 2,
@@ -31,7 +31,7 @@ const movies: Movie[] = [
         length: "2:55:00",
         director_id: 2,
         count: 2,
-        rating: 4.5
+        rating: 5
     },
     {
         id: 3,
@@ -40,7 +40,7 @@ const movies: Movie[] = [
         length: "2:32:00",
         director_id: 3,
         count: 22,
-        rating: 4
+        rating: 3
     }
 ];
 const directors: Director[] = [

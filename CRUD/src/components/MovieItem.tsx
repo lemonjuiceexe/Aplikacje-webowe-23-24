@@ -12,11 +12,11 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
     function editClickHandler() {
         setEditing(prev => !prev);
     }
-    function movieEditHandler(event: React.ChangeEvent<HTMLInputElement>, keyToEdit: string) {
+    function movieEditHandler(event: React.ChangeEvent<HTMLInputElement>, keyToEdit: string, value?: number | string) {
         setMovie(prev => {
             return {
                 ...prev,
-                [keyToEdit]: event.target.value
+                [keyToEdit]: value ? value : event.target.value
             };
         });
     }
@@ -42,14 +42,14 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
                 {!editing ?
                     (<><span className={"font-bold"}>{movie.title}</span> ({movie.year})</>) :
                     (<>
-                        <input className={"input input-bordered input-sm mx-1"}
+                        <input className={"input input-bordered input-sm mx-1 w-40"}
                                type={"text"}
                                value={movie.title}
                                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                                    movieEditHandler(event, "title")
                                }
                         />
-                        <input className={"input input-bordered input-sm mx-1 w-20"}
+                        <input className={"input input-bordered input-sm mx-1 w-14"}
                                type={"number"}
                                min={"1900"} max={"2024"}
                                value={movie.year}
@@ -62,7 +62,7 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
             </td>
             <td>
                 {!editing ? (director.name) : (
-                    <select className={"select select-bordered select-sm"}>
+                    <select className={"select select-bordered select-sm w-32"}>
                         {props.directors.map(director => (
                             <option value={director.id}>{director.name}</option>
                         ))})
@@ -74,7 +74,7 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
                     <div className={"flex items-center"}>
                         {[0, 1, 2].map((index) => (
                             <div key={index}>
-                            <input className={"input input-bordered input-sm mx-1 w-14"}
+                            <input className={"input input-bordered input-sm mx-1 w-10"}
                                    type={"number"}
                                    min={"0"} max={index === 0 ? "99": "59"}
                                    value={movieLength[index]}
@@ -89,11 +89,33 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
                 )}
             </td>
             <td>
-                &#9733;
-                {movie.rating}
+
+                {!editing ? (<span>&#9733;{movie.rating}</span>) : (
+                    <div className="rating">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <input type="radio"
+                                   name={`rating-${movie.id}`}
+                                   className={`mask mask-star-2 bg-secondary`}
+                                   {...(star === movie.rating && {checked: true})}
+                                   onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                                       movieEditHandler(event, "rating", star)
+                                   }
+                            />
+                        ))}
+                    </div>
+                )}
             </td>
             <td>
-                {movie.count}
+            {!editing ? (movie.count) : (
+                    <input className={"input input-bordered input-sm w-10"}
+                           type={"number"}
+                           min={"0"}
+                           value={movie.count}
+                           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                               movieEditHandler(event, "count")
+                           }
+                    />
+                )}
             </td>
             <td>
                 <button
