@@ -88,10 +88,21 @@ function App() {
         };
         setMovies(prevMovies => prevMovies.concat(newMovie));
     }
+    function editMovie(editedMovie: Movie) {
+        setMovies(prevMovies => {
+            const movieIndex = prevMovies.findIndex(movie => movie.id === editedMovie.id);
+            const newMovies = [...prevMovies];
+            newMovies[movieIndex] = editedMovie;
+            return newMovies;
+        });
+    }
+
     function deleteMovie(movieId: number){
         console.log("Deleting movie with id: ", movieId);
         setMovies(prevMovies => prevMovies.filter(movie => movie.id !== movieId));
     }
+
+    console.log(movies.map(movie => movie.rating));
 
     return (
         <>
@@ -115,7 +126,7 @@ function App() {
                     >+</button>
                 </span>
                 <Card>
-                    <MovieList movies={movies} directors={directors} deleteMovie={deleteMovie}/>
+                    <MovieList movies={movies} directors={directors} editMovie={editMovie} deleteMovie={deleteMovie}/>
                 </Card>
             </div>
         </>
