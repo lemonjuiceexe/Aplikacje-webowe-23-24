@@ -74,6 +74,7 @@ export default function MovieList() {
                 <tbody>
                     {movies.map((movie) => (
                         <MovieItem
+                            key={movie.id}
                             movie={movie}
                             directors={directors}
                             editing={false}/>

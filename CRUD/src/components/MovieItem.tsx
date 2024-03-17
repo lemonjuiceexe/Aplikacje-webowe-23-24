@@ -7,6 +7,7 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
     const [director, setDirector] = useState(
         props.directors.filter(director => director.id === movie.director_id)[0]
     );
+    const [movieLength, setMovieLength] = useState(movie.length.split(":"));
 
     function editClickHandler() {
         setEditing(prev => !prev);
@@ -16,6 +17,18 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
             return {
                 ...prev,
                 [keyToEdit]: event.target.value
+            };
+        });
+    }
+    function movieLengthEditHandler(event: React.ChangeEvent<HTMLInputElement>, index: number) {
+        console.log(event.target.value);
+        const newLength = [...movieLength];
+        newLength[index] = event.target.value;
+        setMovieLength(newLength);
+        setMovie(prev => {
+            return {
+                ...prev,
+                length: newLength.join(":")
             };
         });
     }
@@ -36,7 +49,7 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
                                    movieEditHandler(event, "title")
                                }
                         />
-                        <input className={"input input-bordered input-sm mx-1"}
+                        <input className={"input input-bordered input-sm mx-1 w-20"}
                                type={"number"}
                                min={"1900"} max={"2024"}
                                value={movie.year}
@@ -57,7 +70,23 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
                 )}
             </td>
             <td>
-                {movie.length}
+                {!editing ? (movie.length) : (
+                    <div className={"flex items-center"}>
+                        {[0, 1, 2].map((index) => (
+                            <div key={index}>
+                            <input className={"input input-bordered input-sm mx-1 w-14"}
+                                   type={"number"}
+                                   min={"0"} max={index === 0 ? "99": "59"}
+                                   value={movieLength[index]}
+                                   onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                                       movieLengthEditHandler(event, index)
+                                   }
+                            />
+                            {index !== 2 && <span>:</span>}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </td>
             <td>
                 &#9733;
