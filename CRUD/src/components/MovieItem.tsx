@@ -1,4 +1,4 @@
-import {Director, Movie} from "./MovieList.tsx";
+import {Director, Movie} from "../App.tsx";
 import {useState} from "react";
 
 export default function MovieItem(props: {movie: Movie, directors: Director[], editing: boolean}){
@@ -17,7 +17,7 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
             const director = props.directors.filter(director => director.id === parseInt(event.target.value))[0];
             setDirector(director);
         }
-        setMovie(prev => {
+        setMovie((prev: Movie) => {
             return {
                 ...prev,
                 [keyToEdit]: value ? value : event.target.value
@@ -29,7 +29,7 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
         const newLength = [...movieLength];
         newLength[index] = event.target.value;
         setMovieLength(newLength);
-        setMovie(prev => {
+        setMovie((prev: Movie) => {
             return {
                 ...prev,
                 length: newLength.join(":")
@@ -98,7 +98,6 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
                 )}
             </td>
             <td>
-
                 {!editing ? (<span>&#9733;{movie.rating}</span>) : (
                     <div className="rating">
                         {[1, 2, 3, 4, 5].map((star) => (
