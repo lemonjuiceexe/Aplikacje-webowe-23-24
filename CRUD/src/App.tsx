@@ -88,6 +88,10 @@ function App() {
         };
         setMovies(prevMovies => prevMovies.concat(newMovie));
     }
+    function deleteMovie(movieId: number){
+        console.log("Deleting movie with id: ", movieId);
+        setMovies(prevMovies => prevMovies.filter(movie => movie.id !== movieId));
+    }
 
     return (
         <>
@@ -111,7 +115,7 @@ function App() {
                     >+</button>
                 </span>
                 <Card>
-                    <MovieList movies={movies} directors={directors}/>
+                    <MovieList movies={movies} directors={directors} deleteMovie={deleteMovie}/>
                 </Card>
             </div>
         </>

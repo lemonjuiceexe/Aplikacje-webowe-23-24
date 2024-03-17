@@ -1,7 +1,7 @@
 import {Director, Movie} from "../App.tsx";
 import {useState} from "react";
 
-export default function MovieItem(props: {movie: Movie, directors: Director[], editing: boolean}){
+export default function MovieItem(props: {movie: Movie, directors: Director[], editing: boolean, deleteMovie: (movieId: number) => void}){
     const [editing, setEditing] = useState(props.editing);
     const [movie, setMovie] = useState(props.movie);
     const [director, setDirector] = useState(
@@ -11,6 +11,9 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
 
     function editClickHandler() {
         setEditing(prev => !prev);
+    }
+    function deleteClickHandler() {
+        props.deleteMovie(movie.id);
     }
     function movieEditHandler(event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>, keyToEdit: string, value?: number | string) {
         if(keyToEdit === "director_id") {
@@ -126,13 +129,13 @@ export default function MovieItem(props: {movie: Movie, directors: Director[], e
                 )}
             </td>
             <td>
-                <button
-                    onClick={editClickHandler}
-                    className={`btn btn-sm ${!editing ? "btn-warning" : "btn-success text-white"}`}>{!editing ? "Edit" : "Save"}
+                <button onClick={editClickHandler}
+                        className={`btn btn-sm ${!editing ? "btn-warning" : "btn-success text-white"}`}>{!editing ? "Edit" : "Save"}
                 </button>
             </td>
             <td>
-                <button className={"btn btn-sm btn-error text-white"}>Delete</button>
+                <button onClick={deleteClickHandler}
+                        className={"btn btn-sm btn-error text-white"}>Delete</button>
             </td>
         </tr>
     );

@@ -1,7 +1,7 @@
 import MovieItem from "./MovieItem.tsx";
 import {Director, Movie} from "../App.tsx";
 
-export default function MovieList({movies, directors}: {movies: Movie[], directors: Director[]}) {
+export default function MovieList({movies, directors, deleteMovie}: {movies: Movie[], directors: Director[], deleteMovie: (movieId: number) => void}) {
     const columns: string[] = ["id", "Title", "Director", "Length", "Rating", "Count"];
     return (
         <div className={"overflow-x-auto"}>
@@ -20,7 +20,9 @@ export default function MovieList({movies, directors}: {movies: Movie[], directo
                             key={movie.id}
                             movie={movie}
                             directors={directors}
-                            editing={false}/>
+                            editing={false}
+                            deleteMovie={deleteMovie}
+                        />
                     ))}
                 </tbody>
             </table>
