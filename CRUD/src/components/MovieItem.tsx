@@ -11,7 +11,7 @@ export default function MovieItem(props: {
     );
     const [movieLength, setMovieLength] = useState(props.movie.length.split(":"));
 
-    const [movieTitle, setMovieTitle] = useState(props.movie.title);
+    const [movieRating, setMovieRating] = useState(props.movie.rating);
 
     const movieTitleRef = useRef<HTMLInputElement>(null);
     const movieYearRef = useRef<HTMLInputElement>(null);
@@ -19,7 +19,6 @@ export default function MovieItem(props: {
     const movieLengthHourRef = useRef<HTMLInputElement>(null);
     const movieLengthMinuteRef = useRef<HTMLInputElement>(null);
     const movieLengthSecondRef = useRef<HTMLInputElement>(null);
-    const movieRatingRef = useRef<HTMLInputElement>(null);
     const movieCountRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -44,7 +43,6 @@ export default function MovieItem(props: {
         const year = movieYearRef.current?.value ? parseInt(movieYearRef.current.value) : props.movie.year;
         const director = movieDirectorRef.current?.value ? parseInt(movieDirectorRef.current.value) : props.movie.director_id;
         const movieLength = `${movieLengthHourRef.current!.value}:${movieLengthMinuteRef.current!.value}:${movieLengthSecondRef.current!.value}`;
-        const movieRating = movieRatingRef.current?.value ? parseInt(movieRatingRef.current.value) : props.movie.rating;
         const movieCount = movieCountRef.current?.value ? parseInt(movieCountRef.current.value) : props.movie.count;
 
         const editedMovie: Movie = {
@@ -57,15 +55,6 @@ export default function MovieItem(props: {
             count: movieCount
         };
 
-        props.editMovie(editedMovie);
-    }
-    function movieLengthEditHandler(event: React.ChangeEvent<HTMLInputElement>, index: number) {
-        console.log(event.target.value);
-        const newLength = [...movieLength];
-        newLength[index] = event.target.value;
-        setMovieLength(newLength);
-        const editedMovie: Movie = {...props.movie};
-        editedMovie.length = newLength.join(":");
         props.editMovie(editedMovie);
     }
 
@@ -132,7 +121,7 @@ export default function MovieItem(props: {
                                    name={`rating-${props.movie.id}`}
                                    className={`mask mask-star-2 bg-secondary`}
                                    defaultChecked={star === props.movie.rating}
-                                   ref={movieRatingRef}
+                                   onClick={() => setMovieRating(star)}
                             />
                         ))}
                     </div>
