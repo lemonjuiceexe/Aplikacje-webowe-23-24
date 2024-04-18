@@ -1,5 +1,5 @@
 import {Director, Movie} from "../App.tsx";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 export default function MovieItem(props: {
     movie: Movie, directors: Director[], editing: boolean,
@@ -11,24 +11,51 @@ export default function MovieItem(props: {
     );
     const [movieLength, setMovieLength] = useState(props.movie.length.split(":"));
 
+    const [movieTitle, setMovieTitle] = useState(props.movie.title);
+
+    const movieTitleRef = useRef<HTMLInputElement>(null);
+    const movieYearRef = useRef<HTMLInputElement>(null);
+    const movieDirectorRef = useRef<HTMLSelectElement>(null);
+    const movieLengthHourRef = useRef<HTMLInputElement>(null);
+    const movieLengthMinuteRef = useRef<HTMLInputElement>(null);
+    const movieLengthSecondRef = useRef<HTMLInputElement>(null);
+    const movieRatingRef = useRef<HTMLInputElement>(null);
+    const movieCountRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        refreshDirector();
+    }, [props.movie]);
+
+
+    function refreshDirector(){
+        setDirector(props.directors.filter(director => director.id === props.movie.director_id)[0]);
+    }
     function editClickHandler() {
+        if (editing) {
+            editMovie();
+        }
         setEditing(prev => !prev);
+        refreshDirector();
     }
     function deleteClickHandler() {
         props.deleteMovie(props.movie.id);
     }
-    function movieEditHandler(event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>, keyToEdit: string, value?: number | string) {
-        if(keyToEdit === "director_id") {
-            const director = props.directors.filter(director => director.id === parseInt(event.target.value))[0];
-            setDirector(director);
-        }
-        const editedMovie: Movie = {...props.movie};
-        //FIXME: i don't get what's typescript's problem
-        if(value) {
-            editedMovie[keyToEdit] = value;
-        } else {
-            editedMovie[keyToEdit] = event.target.value;
-        }
+    function editMovie() {
+        const year = movieYearRef.current?.value ? parseInt(movieYearRef.current.value) : props.movie.year;
+        const director = movieDirectorRef.current?.value ? parseInt(movieDirectorRef.current.value) : props.movie.director_id;
+        const movieLength = `${movieLengthHourRef.current!.value}:${movieLengthMinuteRef.current!.value}:${movieLengthSecondRef.current!.value}`;
+        const movieRating = movieRatingRef.current?.value ? parseInt(movieRatingRef.current.value) : props.movie.rating;
+        const movieCount = movieCountRef.current?.value ? parseInt(movieCountRef.current.value) : props.movie.count;
+
+        const editedMovie: Movie = {
+            id: props.movie.id,
+            title: movieTitleRef.current?.value || props.movie.title,
+            year: year,
+            director_id: director,
+            length: movieLength,
+            rating: movieRating,
+            count: movieCount
+        };
 
         props.editMovie(editedMovie);
     }
@@ -53,18 +80,16 @@ export default function MovieItem(props: {
                     (<>
                         <input className={"input input-bordered input-sm mx-1 w-40"}
                                type={"text"}
-                               value={props.movie.title}
-                               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                   movieEditHandler(event, "title")
-                               }
+                               placeholder={props.movie.title}
+                               defaultValue={props.movie.title}
+                               ref={movieTitleRef}
                         />
                         <input className={"input input-bordered input-sm mx-1 w-14"}
                                type={"number"}
                                min={"1900"} max={"2024"}
-                               value={props.movie.year}
-                               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                  movieEditHandler(event, "year")
-                               }
+                               placeholder={props.movie.year.toString()}
+                               defaultValue={props.movie.year.toString()}
+                               ref={movieYearRef}
                         />
                     </>)
                 }
@@ -72,10 +97,8 @@ export default function MovieItem(props: {
             <td>
                 {!editing ? (director.name) : (
                     <select className={"select select-bordered select-sm w-48"}
-                            value={director.id}
-                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
-                                movieEditHandler(event, "director_id")
-                            }
+                            defaultValue={director.id.toString()}
+                            ref={movieDirectorRef}
                     >
                         {props.directors.map((director, index) => (
                             <option value={director.id} key={index}>{director.name}</option>
@@ -91,10 +114,8 @@ export default function MovieItem(props: {
                             <input className={"input input-bordered input-sm mx-1 w-12"}
                                    type={"number"}
                                    min={"0"} max={index === 0 ? "99": "59"}
-                                   value={movieLength[index]}
-                                   onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                       movieLengthEditHandler(event, index)
-                                   }
+                                   defaultValue={movieLength[index]}
+                                   ref={[movieLengthHourRef, movieLengthMinuteRef, movieLengthSecondRef][index]}
                             />
                             {index !== 2 && <span>:</span>}
                             </div>
@@ -110,10 +131,8 @@ export default function MovieItem(props: {
                                    key={star}
                                    name={`rating-${props.movie.id}`}
                                    className={`mask mask-star-2 bg-secondary`}
-                                   {...(star === props.movie.rating && {checked: true})}
-                                   onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                       movieEditHandler(event, "rating", star)
-                                   }
+                                   defaultChecked={star === props.movie.rating}
+                                   ref={movieRatingRef}
                             />
                         ))}
                     </div>
@@ -124,10 +143,8 @@ export default function MovieItem(props: {
                     <input className={"input input-bordered input-sm w-14"}
                            type={"number"}
                            min={"0"}
-                           value={props.movie.count}
-                           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                               movieEditHandler(event, "count")
-                           }
+                           defaultValue={props.movie.count}
+                           ref={movieCountRef}
                     />
                 )}
             </td>

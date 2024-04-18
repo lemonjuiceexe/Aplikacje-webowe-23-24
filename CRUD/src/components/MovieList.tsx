@@ -16,9 +16,9 @@ export default function MovieList({movies, directors, editMovie, deleteMovie}:
                     </tr>
                 </thead>
                 <tbody>
-                    {movies.map((movie) => (
+                    {movies.map((movie, index) => (
                         <MovieItem
-                            key={movie.id}
+                            key={index}
                             movie={movie}
                             directors={directors}
                             editing={false}
