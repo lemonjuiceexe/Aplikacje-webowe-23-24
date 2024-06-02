@@ -27,6 +27,14 @@ class GameManager {
 				}
 			}
 		}
+        // randomly fill empty spaces with obstacles
+        for($i = 0; $i < 13; $i++){
+            for($j = 0; $j < 31; $j++){
+                if($this->board[$i][$j] == Field::Empty && rand(0, 100) < 20){
+                    $this->board[$i][$j] = Field::Obstacle;
+                }
+            }
+        }
 	}
 }
 
