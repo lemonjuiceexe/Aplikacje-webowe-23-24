@@ -1,0 +1,29 @@
+import { drawBoard } from "./canvas.ts";
+
+import './style.css';
+
+const socket = new WebSocket('ws://127.0.0.1:46089');
+
+socket.onopen = () => {
+    console.log('Connection with server established');
+};
+
+// Event listener for receiving messages from the server
+socket.addEventListener('message', (event) => {
+    console.log('Received from server:', JSON.parse(event.data));
+    drawBoard(JSON.parse(event.data));
+});
+
+// Event listener for when the connection is closed
+socket.addEventListener('close', (_) => {
+    console.log('Connection closed');
+});
+
+// Event listener for handling errors
+socket.addEventListener('error', (event) => {
+    console.error('Connection error:', event);
+});
+
+document.querySelector("#btn")!.addEventListener("click", () => {
+    socket.send("i have been clicked");
+});
