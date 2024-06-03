@@ -1,9 +1,16 @@
 import { drawBoard } from "./canvas.ts";
 
 import './style.css';
-import {ServerResponse} from "./types.ts";
+import {Balloon, Field, ServerResponse} from "./types.ts";
 
 const socket = new WebSocket('ws://127.0.0.1:46089');
+
+let board: Array<Array<Field | Balloon>> = [];
+let animation_tick = 0;
+
+setInterval(() => {
+    drawBoard(board, animation_tick++);
+}, 500);
 
 socket.onopen = () => {
     console.log('Connection with server established');
@@ -13,7 +20,8 @@ socket.onopen = () => {
 socket.addEventListener('message', (event) => {
     const response: ServerResponse = JSON.parse(event.data);
     console.log('Received from server:', response);
-    drawBoard(response.board);
+    board = response.board;
+    // drawBoard(response.board);
 });
 
 // Event listener for when the connection is closed

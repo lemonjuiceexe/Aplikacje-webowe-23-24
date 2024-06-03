@@ -19,6 +19,7 @@ class Balloon
     public $x;
     public $y;
     public $direction;
+    public $last_horizontal_direction;
     public $move_percentage;
 
     public function __construct($x, $y, $direction)
@@ -27,6 +28,12 @@ class Balloon
         $this->y = $y;
         $this->direction = $direction;
         $this->move_percentage = 0;
+
+        if(in_array($direction, [Direction::Up, Direction::Down])) {
+            $this->last_horizontal_direction = Direction::Right;
+        } else {
+            $this->last_horizontal_direction = $this->direction;
+        }
     }
 }
 
@@ -51,8 +58,7 @@ class GameManager
                     // Randomly spawn baloons in empty spaces
                     if (rand(0, 100) < 10) {
                         $this->board[$i][$j] = new Balloon($i, $j, rand(0, 3));
-                    } 
-                    else {
+                    } else {
                         $this->board[$i][$j] = Field::Empty;
                     }
                 }

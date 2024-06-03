@@ -1,6 +1,6 @@
-import {Balloon, Field} from "./types.ts";
+import {Balloon, Direction, Field} from "./types.ts";
 
-export function drawBoard(board: Array<Array<Field | Balloon>>): void {
+export function drawBoard(board: Array<Array<Field | Balloon>>, animation_tick: number): void {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -10,8 +10,23 @@ export function drawBoard(board: Array<Array<Field | Balloon>>): void {
             // draw different image based on field
             const image = new Image();
 
-            if(typeof field === 'object')
-                image.src = 'animations/balloon/balloon.png';
+            if(typeof field === 'object') {
+                const balloon = field as Balloon;
+                const balloon_animation_frame = Math.abs(2 - (animation_tick % 4));
+                switch (balloon.last_horizontal_direction) {
+                    case Direction.Left:
+                        image.src = `animations/balloon/left_${balloon_animation_frame}.png`;
+                        break;
+                    case Direction.Right:
+                        image.src = `animations/balloon/right_${balloon_animation_frame}.png`;
+                        break;
+                    default:
+                        console.log("my fucking direction's ", balloon.last_horizontal_direction);
+                        image.src = 'animations/balloon/balloon.png';
+                        break;
+                }
+                console.log(image.src);
+            }
             else{
                 switch (field) {
                     case Field.Empty:

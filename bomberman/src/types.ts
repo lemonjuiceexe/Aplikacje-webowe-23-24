@@ -11,14 +11,23 @@ export enum Direction {
     Left = 3,
 }
 
-export interface Baloon{
-    x: number,
-    y: number,
-    direction: Direction,
-    move_percentage: number,
-}
-
 export interface ServerResponse {
     id: string,
     board: Array<Array<Field | Baloon>>
+}
+
+export class Balloon {
+    x: number;
+    y: number;
+    direction: Direction;
+    move_percentage: number;
+    last_horizontal_direction: Direction.Left | Direction.Right;
+
+    constructor(x: number, y: number, direction: Direction, move_percentage: number, last_horizontal_direction: Direction.Left | Direction.Right) {
+        this.x = x;
+        this.y = y;
+        this.direction = direction;
+        this.move_percentage = move_percentage;
+        this.last_horizontal_direction = last_horizontal_direction;
+    }
 }
