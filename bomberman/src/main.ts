@@ -1,6 +1,7 @@
 import { drawBoard } from "./canvas.ts";
 
 import './style.css';
+import {ServerResponse} from "./types.ts";
 
 const socket = new WebSocket('ws://127.0.0.1:46089');
 
@@ -10,8 +11,9 @@ socket.onopen = () => {
 
 // Event listener for receiving messages from the server
 socket.addEventListener('message', (event) => {
-    console.log('Received from server:', JSON.parse(event.data));
-    drawBoard(JSON.parse(event.data));
+    const response: ServerResponse = JSON.parse(event.data);
+    console.log('Received from server:', response);
+    drawBoard(response.board);
 });
 
 // Event listener for when the connection is closed

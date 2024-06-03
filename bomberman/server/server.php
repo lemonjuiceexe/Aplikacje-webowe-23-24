@@ -1,53 +1,93 @@
 <?php
-class Field {
-	const Empty = "-";
-	const Border = "*";
-	const Obstacle = "X";
-	const Player = "P";
-	const Enemy = "E";
+class Field
+{
+    const Empty = "-";
+    const Border = "*";
+    const Obstacle = "X";
+    const Player = "P";
+}
+class Direction
+{
+    const Up = 0;
+    const Right = 1;
+    const Down = 2;
+    const Left = 3;
 }
 
-class GameManager {
-	public $board = array();
+class Balloon
+{
+    public $x;
+    public $y;
+    public $direction;
+    public $move_percentage;
 
-	public function initialise_board(){
-		for($i = 0; $i < 13; $i++){
-			$this->board[$i] = array();
-			for($j = 0; $j < 31; $j++){
+    public function __construct($x, $y, $direction)
+    {
+        $this->x = $x;
+        $this->y = $y;
+        $this->direction = $direction;
+        $this->move_percentage = 0;
+    }
+}
+
+class GameManager
+{
+    public $board = array();
+    public $balloons = array();
+
+    public function initialise_board()
+    {
+        for ($i = 0; $i < 13; $i++) {
+            $this->board[$i] = array();
+            for ($j = 0; $j < 31; $j++) {
                 // Board borders
-				if($i == 0 || $i == 12 || $j == 0 || $j == 30){
-					$this->board[$i][$j] = Field::Border;
-				}
-                // Central unbreakable walls
-                else if ($i % 2 == 0 && $j % 2 == 0){
+                if ($i == 0 || $i == 12 || $j == 0 || $j == 30) {
                     $this->board[$i][$j] = Field::Border;
                 }
-                else{
-					$this->board[$i][$j] = Field::Empty;
-				}
-			}
-		}
-        // randomly fill empty spaces with obstacles
-        for($i = 0; $i < 13; $i++){
-            for($j = 0; $j < 31; $j++){
-                if($this->board[$i][$j] == Field::Empty && rand(0, 100) < 20){
+                // Central unbreakable walls
+                else if ($i % 2 == 0 && $j % 2 == 0) {
+                    $this->board[$i][$j] = Field::Border;
+                } else {
+                    // Randomly spawn baloons in empty spaces
+                    if (rand(0, 100) < 10) {
+                        $this->board[$i][$j] = new Balloon($i, $j, rand(0, 3));
+                    } 
+                    else {
+                        $this->board[$i][$j] = Field::Empty;
+                    }
+                }
+            }
+        }
+        // Randomly fill empty spaces with obstacles
+        for ($i = 0; $i < 13; $i++) {
+            for ($j = 0; $j < 31; $j++) {
+                if (
+                    $this->board[$i][$j] == Field::Empty && rand(0, 100) < 20
+                    // Make sure the player can move freely at the start
+                    && ($i > 4 || $j > 4)
+                ) {
                     $this->board[$i][$j] = Field::Obstacle;
                 }
             }
         }
-	}
+        $this->board[1][1] = Field::Player;
+
+    }
 }
 
-class SocketServer {
+class SocketServer
+{
     private $host;
     private $port;
     private $server;
     private $clients;
     private $game_manager;
+    private $players;
 
     private $tick_time = 1;
 
-    public function __construct($host, $port, $game_manager) {
+    public function __construct($host, $port, $game_manager)
+    {
         $this->host = $host;
         $this->port = $port;
         $this->game_manager = $game_manager;
@@ -56,9 +96,11 @@ class SocketServer {
             die("$errstr ($errno)");
         }
         $this->clients = array($this->server);
+        $this->players = array();
     }
 
-    public function run() {
+    public function run()
+    {
         $write = NULL;
         $except = NULL;
 
@@ -71,20 +113,28 @@ class SocketServer {
                 if (!$client) {
                     continue;
                 }
+
+                $new_client_id = uniqid();
                 $this->clients[] = $client;
-                $ip = stream_socket_get_name($client, true);
-                echo "New Client connected from $ip\n";
+                $this->players[$new_client_id] = $client;
 
                 stream_set_blocking($client, true);
                 $headers = fread($client, 1500);
                 $this->handshake($client, $headers, $this->host, $this->port);
                 stream_set_blocking($client, false);
 
-				// Initial message after connecting
-//                 $data=["message" => "Connection with server estabilished"];
-                $this->send_message($this->clients, $this->mask(
-                	json_encode($this->game_manager->board)
-                ));
+                // Initial message after connecting
+                $data = json_encode([
+                    "id" => $new_client_id,
+                    "board" => $this->game_manager->board
+                ]);
+
+                $this->send_message(
+                    $this->clients,
+                    $this->mask(
+                        $data
+                    )
+                );
 
                 $found_socket = array_search($this->server, $changed);
                 unset($changed[$found_socket]);
@@ -108,17 +158,40 @@ class SocketServer {
 
                 $response = $this->mask($unmasked);
                 $this->send_message($this->clients, $response);
+
+                // Send the current board and client ID to all clients every tick
+                foreach ($this->players as $player_id => $player) {
+                    if ($player == $changed_socket) {
+                        echo "Player $player_id moved\n";
+
+                        $data = json_encode([
+                            "id" => $player_id,
+                            "board" => $this->game_manager->board
+                        ]);
+                        $this->send_message(
+                            $this->clients,
+                            $this->mask(
+                                $data
+                            )
+                        );
+                    }
+                }
             }
 
-			// Send the board to all clients every tick
-            $this->send_message($this->clients, $this->mask(
-                	json_encode($this->game_manager->board)
-            ));
+            // Send the current board to all clients every tick
+            $data = json_encode([
+                "board" => $this->game_manager->board
+            ]);
+            $this->send_message(
+                $this->clients,
+                $this->mask($data)
+            );
         }
         fclose($this->server);
     }
 
-    private function unmask($text) {
+    private function unmask($text)
+    {
         $length = @ord($text[1]) & 127;
         if ($length == 126) {
             $masks = substr($text, 4, 4);
@@ -136,7 +209,8 @@ class SocketServer {
         }
         return $text;
     }
-    private function mask($text) {
+    private function mask($text)
+    {
         $b1 = 0x80 | (0x1 & 0x0f);
         $length = strlen($text);
         if ($length <= 125)
@@ -147,7 +221,8 @@ class SocketServer {
             $header = pack('CCNN', $b1, 127, $length);
         return $header . $text;
     }
-    private function handshake($client, $rcvd, $host, $port) {
+    private function handshake($client, $rcvd, $host, $port)
+    {
         $headers = array();
         $lines = preg_split("/\r\n/", $rcvd);
         foreach ($lines as $line) {
@@ -158,17 +233,18 @@ class SocketServer {
         }
         $secKey = $headers['Sec-WebSocket-Key'];
         $secAccept = base64_encode(pack('H*', sha1($secKey . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')));
-        $upgrade  = "HTTP/1.1 101 Web Socket Protocol Handshake\r\n" .
+        $upgrade = "HTTP/1.1 101 Web Socket Protocol Handshake\r\n" .
             "Upgrade: websocket\r\n" .
             "Connection: Upgrade\r\n" .
             "WebSocket-Origin: $host\r\n" .
             "WebSocket-Location: ssl://$host:$port\r\n" .
-            "Sec-WebSocket-Version: 13\r\n".
+            "Sec-WebSocket-Version: 13\r\n" .
             "Sec-WebSocket-Accept:$secAccept\r\n\r\n";
         fwrite($client, $upgrade);
     }
 
-    private function send_message($clients, $msg) {
+    private function send_message($clients, $msg)
+    {
         foreach ($clients as $changed_socket) {
             @fwrite($changed_socket, $msg);
         }
