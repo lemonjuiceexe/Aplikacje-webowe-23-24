@@ -35,61 +35,54 @@ class Balloon
             $this->last_horizontal_direction = $this->direction;
         }
     }
-    public function move($board) {
-        echo "My direction is $this->direction\n";
-        if($this->move_percentage == 100)
-            $this->move_percentage = 0;
-        if($this->move_percentage == 0){
-            $can_move = false;
-            $new_x = $this->x;
-            $new_y = $this->y;
 
-            switch ($this->direction) {
-                case Direction::Up:
-                    $new_x -= 1;
-                    break;
-                case Direction::Right:
-                    $new_y += 1;
-                    break;
-                case Direction::Down:
-                    $new_x += 1;
-                    break;
-                case Direction::Left:
-                    $new_y -= 1;
-                    break;
-            }
 
-            if ($board[$new_x][$new_y] == Field::Empty || $board[$new_x][$new_y] == Field::Player) {
-                $can_move = true;
-            }
+    public function calculate_position_after_move($direction){
+        $new_x = $this->x;
+        $new_y = $this->y;
 
-            if ($can_move && rand(0, 100) < 80) {
-                $this->x = $new_x;
-                $this->y = $new_y;
-                echo "Balloon moved to $this->x, $this->y\n";
+        switch ($direction) {
+            case Direction::Up:
+                $new_x -= 1;
+                break;
+            case Direction::Right:
+                $new_y += 1;
+                break;
+            case Direction::Down:
+                $new_x += 1;
+                break;
+            case Direction::Left:
+                $new_y -= 1;
+                break;
+        }
+        return [$new_x, $new_y];
+    }
+    public function is_legal_move($direction, $board)
+    {
+        $new_position = $this->calculate_position_after_move($direction);
+
+        // if ($new_x < 1 || $new_x >= count($board) - 1 || $new_y < 1 || $new_y >= count($board[0]) - 1) {
+        //     return false;
+        // }
+
+        if ($board[$new_position[0]][$new_position[1]] == Field::Border || $board[$new_position[0]][$new_position[1]] == Field::Obstacle) {
+            return false;
+        }
+
+        return true;
+    }
+    public function move($board)
+    {
+        if ($this->move_percentage == 0) {
+            if ($this->is_legal_move($this->direction, $board) && rand(0, 100) < 80) {
+                $new_pos = $this->calculate_position_after_move($this->direction);
+                $this->x = $new_pos[0];
+                $this->y = $new_pos[1];
             } else {
                 $possible_directions = [];
 
                 foreach ([Direction::Up, Direction::Right, Direction::Down, Direction::Left] as $dir) {
-                    $test_x = $this->x;
-                    $test_y = $this->y;
-
-                    switch ($dir) {
-                        case Direction::Up:
-                            $test_x -= 1;
-                            break;
-                        case Direction::Right:
-                            $test_y += 1;
-                            break;
-                        case Direction::Down:
-                            $test_x += 1;
-                            break;
-                        case Direction::Left:
-                            $test_y -= 1;
-                            break;
-                    }
-
-                    if ($board[$test_x][$test_y] == Field::Empty || $board[$test_x][$test_y] == Field::Player) {
+                    if ($this->is_legal_move($dir, $board)) {
                         $possible_directions[] = $dir;
                     }
                 }
@@ -98,8 +91,6 @@ class Balloon
                     $this->direction = $possible_directions[array_rand($possible_directions)];
                 }
             }
-        } else{
-            $this->move_percentage += 10;
         }
     }
 }
