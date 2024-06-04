@@ -35,6 +35,73 @@ class Balloon
             $this->last_horizontal_direction = $this->direction;
         }
     }
+    public function move($board) {
+        echo "My direction is $this->direction\n";
+        if($this->move_percentage == 100)
+            $this->move_percentage = 0;
+        if($this->move_percentage == 0){
+            $can_move = false;
+            $new_x = $this->x;
+            $new_y = $this->y;
+
+            switch ($this->direction) {
+                case Direction::Up:
+                    $new_x -= 1;
+                    break;
+                case Direction::Right:
+                    $new_y += 1;
+                    break;
+                case Direction::Down:
+                    $new_x += 1;
+                    break;
+                case Direction::Left:
+                    $new_y -= 1;
+                    break;
+            }
+
+            if ($board[$new_x][$new_y] == Field::Empty || $board[$new_x][$new_y] == Field::Player) {
+                $can_move = true;
+            }
+
+            if ($can_move && rand(0, 100) < 80) {
+                $this->x = $new_x;
+                $this->y = $new_y;
+                echo "Balloon moved to $this->x, $this->y\n";
+            } else {
+                $possible_directions = [];
+
+                foreach ([Direction::Up, Direction::Right, Direction::Down, Direction::Left] as $dir) {
+                    $test_x = $this->x;
+                    $test_y = $this->y;
+
+                    switch ($dir) {
+                        case Direction::Up:
+                            $test_x -= 1;
+                            break;
+                        case Direction::Right:
+                            $test_y += 1;
+                            break;
+                        case Direction::Down:
+                            $test_x += 1;
+                            break;
+                        case Direction::Left:
+                            $test_y -= 1;
+                            break;
+                    }
+
+                    if ($board[$test_x][$test_y] == Field::Empty || $board[$test_x][$test_y] == Field::Player) {
+                        $possible_directions[] = $dir;
+                    }
+                }
+
+                if (!empty($possible_directions)) {
+                    $this->direction = $possible_directions[array_rand($possible_directions)];
+                }
+            }
+        } else{
+            $this->move_percentage += 10;
+        }
+    }
 }
 
 class GameManager
@@ -55,12 +122,20 @@ class GameManager
                 else if ($i % 2 == 0 && $j % 2 == 0) {
                     $this->board[$i][$j] = Field::Border;
                 } else {
-                    // Randomly spawn baloons in empty spaces
-                    if (rand(0, 100) < 10) {
-                        $this->board[$i][$j] = new Balloon($i, $j, rand(0, 3));
-                    } else {
+                    // Temporarily only spawn one balloon
+                    if($i == 3 && $j == 3){
+                        $balloon = new Balloon($i, $j, rand(0, 3));
+                        $this->balloons[] = $balloon;
+                        $this->board[$i][$j] = $balloon;
+                    } else{
                         $this->board[$i][$j] = Field::Empty;
                     }
+                    // // Randomly spawn baloons in empty spaces
+                    // if (rand(0, 100) < 10) {
+                    //     $this->board[$i][$j] = new Balloon($i, $j, rand(0, 3));
+                    // } else {
+                    //     $this->board[$i][$j] = Field::Empty;
+                    // }
                 }
             }
         }
@@ -77,7 +152,20 @@ class GameManager
             }
         }
         $this->board[1][1] = Field::Player;
-
+    }
+    public function update_board(){
+        //remove all balloons from the board
+        for ($i = 0; $i < 13; $i++) {
+            for ($j = 0; $j < 31; $j++) {
+                if($this->board[$i][$j] instanceof Balloon){
+                    $this->board[$i][$j] = Field::Empty;
+                }
+            }
+        }
+        foreach ($this->balloons as $balloon) {
+            $this->board[$balloon->y][$balloon->x] = $balloon;
+            echo "Balloon at $balloon->x, $balloon->y\n";
+        }
     }
 }
 
@@ -183,6 +271,13 @@ class SocketServer
                     }
                 }
             }
+
+            // Move balloons every tick
+            echo "There are " . count($this->game_manager->balloons) . " balloons\n";
+            foreach ($this->game_manager->balloons as $balloon) {
+                $balloon->move($this->game_manager->board);
+            }
+            $this->game_manager->update_board();
 
             // Send the current board to all clients every tick
             $data = json_encode([
