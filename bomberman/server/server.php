@@ -104,20 +104,10 @@ class GameManager
 {
     public $board = array();
     public $balloons = array();
+    public $max_balloon_count = 15;
 
     public function initialise_board()
     {
-        // Generate unique random positions for 12 balloons
-        $balloons_positions = [];
-        while (count($balloons_positions) < 12) {
-            $x = rand(1, 25);
-            $y = rand(1, 11);
-            $position = [$x, $y];
-            if (!in_array($position, $balloons_positions)) {
-                $balloons_positions[] = $position;
-            }
-        }
-
         for ($i = 0; $i < 13; $i++) {
             $this->board[$i] = array();
             for ($j = 0; $j < 27; $j++) {
@@ -129,7 +119,7 @@ class GameManager
                 else if ($i % 2 == 0 && $j % 2 == 0) {
                     $this->board[$i][$j] = Field::Border;
                 } else {
-                    if (in_array([$j, $i], $balloons_positions)) {
+                    if (count($this->balloons) < $this->max_balloon_count && rand(0, 100) < 10) {
                         $balloon = new Balloon($j, $i, rand(0, 3));
                         $this->balloons[] = $balloon;
                         $this->board[$i][$j] = $balloon;
