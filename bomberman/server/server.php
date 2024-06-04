@@ -43,16 +43,16 @@ class Balloon
 
         switch ($direction) {
             case Direction::Up:
-                $new_x -= 1;
+                $new_y--;
                 break;
             case Direction::Right:
-                $new_y += 1;
+                $new_x++;
                 break;
             case Direction::Down:
-                $new_x += 1;
+                $new_y++;
                 break;
             case Direction::Left:
-                $new_y -= 1;
+                $new_x--;
                 break;
         }
         return [$new_x, $new_y];
@@ -60,12 +60,13 @@ class Balloon
     public function is_legal_move($direction, $board)
     {
         $new_position = $this->calculate_position_after_move($direction);
+        echo "New position: $new_position[0], $new_position[1]\n";
 
-        // if ($new_x < 1 || $new_x >= count($board) - 1 || $new_y < 1 || $new_y >= count($board[0]) - 1) {
-        //     return false;
-        // }
+        if ($new_position[0] < 1 || $new_position[0] >= count($board) - 1 || $new_position[1] < 1 || $new_position[1] >= count($board[0]) - 1) {
+            return false;
+        }
 
-        if ($board[$new_position[0]][$new_position[1]] == Field::Border || $board[$new_position[0]][$new_position[1]] == Field::Obstacle) {
+        if ($board[$new_position[1]][$new_position[0]] == Field::Border || $board[$new_position[1]][$new_position[0]] == Field::Obstacle) {
             return false;
         }
 
@@ -92,6 +93,7 @@ class Balloon
                 }
             }
         }
+        // else{ $this->move_percentage += 10; }
     }
 }
 
@@ -102,6 +104,14 @@ class GameManager
 
     public function initialise_board()
     {
+        // generate random positions for 12 balloons
+        $balloons_positions = [];
+        for ($i = 0; $i < 12; $i++) {
+            $y = rand(1, 30);
+            $x = rand(1, 12);
+            $balloons_positions[] = [$x, $y];
+        }
+
         for ($i = 0; $i < 13; $i++) {
             $this->board[$i] = array();
             for ($j = 0; $j < 31; $j++) {
@@ -113,17 +123,19 @@ class GameManager
                 else if ($i % 2 == 0 && $j % 2 == 0) {
                     $this->board[$i][$j] = Field::Border;
                 } else {
-                    // Temporarily only spawn one balloon
-                    if($i == 3 && $j == 3){
+                    if(in_array([$i, $j], $balloons_positions)){
                         $balloon = new Balloon($i, $j, rand(0, 3));
                         $this->balloons[] = $balloon;
                         $this->board[$i][$j] = $balloon;
                     } else{
                         $this->board[$i][$j] = Field::Empty;
                     }
-                    // // Randomly spawn baloons in empty spaces
-                    // if (rand(0, 100) < 10) {
-                    //     $this->board[$i][$j] = new Balloon($i, $j, rand(0, 3));
+                    // Randomly spawn baloons in empty spaces
+                    // if (rand(0, 100) < 1) {
+                    //     echo "$i $j\n";
+                    //     $balloon = new Balloon($i, $j, rand(0, 3));
+                    //     $this->balloons[] = $balloon;
+                    //     $this->board[$i][$j] = $balloon;
                     // } else {
                     //     $this->board[$i][$j] = Field::Empty;
                     // }
