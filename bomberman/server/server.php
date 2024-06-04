@@ -6,6 +6,7 @@ class Field
     const Obstacle = "X";
     const Player = "P";
 }
+
 class Direction
 {
     const Up = 0;
@@ -29,15 +30,15 @@ class Balloon
         $this->direction = $direction;
         $this->move_percentage = 0;
 
-        if(in_array($direction, [Direction::Up, Direction::Down])) {
+        if (in_array($direction, [Direction::Up, Direction::Down])) {
             $this->last_horizontal_direction = Direction::Right;
         } else {
             $this->last_horizontal_direction = $this->direction;
         }
     }
 
-
-    public function calculate_position_after_move($direction){
+    public function calculate_position_after_move($direction)
+    {
         $new_x = $this->x;
         $new_y = $this->y;
 
@@ -57,28 +58,31 @@ class Balloon
         }
         return [$new_x, $new_y];
     }
+
     public function is_legal_move($direction, $board)
     {
-        $new_position = $this->calculate_position_after_move($direction);
-        echo "New position: $new_position[0], $new_position[1]\n";
+        list($new_x, $new_y) = $this->calculate_position_after_move($direction);
 
-        if ($new_position[0] < 1 || $new_position[0] >= count($board) - 1 || $new_position[1] < 1 || $new_position[1] >= count($board[0]) - 1) {
+        // Ensure the new position is within the board boundaries
+        if ($new_x < 0 || $new_x >= count($board[0]) || $new_y < 0 || $new_y >= count($board)) {
             return false;
         }
 
-        if ($board[$new_position[1]][$new_position[0]] == Field::Border || $board[$new_position[1]][$new_position[0]] == Field::Obstacle) {
+        // Check if the position is not a Border or Obstacle
+        if ($board[$new_y][$new_x] == Field::Border || $board[$new_y][$new_x] == Field::Obstacle) {
             return false;
         }
 
         return true;
     }
+
     public function move($board)
     {
         if ($this->move_percentage == 0) {
             if ($this->is_legal_move($this->direction, $board) && rand(0, 100) < 80) {
-                $new_pos = $this->calculate_position_after_move($this->direction);
-                $this->x = $new_pos[0];
-                $this->y = $new_pos[1];
+                list($new_x, $new_y) = $this->calculate_position_after_move($this->direction);
+                $this->x = $new_x;
+                $this->y = $new_y;
             } else {
                 $possible_directions = [];
 
@@ -93,7 +97,6 @@ class Balloon
                 }
             }
         }
-        // else{ $this->move_percentage += 10; }
     }
 }
 
@@ -104,47 +107,41 @@ class GameManager
 
     public function initialise_board()
     {
-        // generate random positions for 12 balloons
+        // Generate unique random positions for 12 balloons
         $balloons_positions = [];
-        for ($i = 0; $i < 12; $i++) {
-            $y = rand(1, 30);
-            $x = rand(1, 12);
-            $balloons_positions[] = [$x, $y];
+        while (count($balloons_positions) < 12) {
+            $x = rand(1, 25);
+            $y = rand(1, 11);
+            $position = [$x, $y];
+            if (!in_array($position, $balloons_positions)) {
+                $balloons_positions[] = $position;
+            }
         }
 
         for ($i = 0; $i < 13; $i++) {
             $this->board[$i] = array();
-            for ($j = 0; $j < 31; $j++) {
+            for ($j = 0; $j < 27; $j++) {
                 // Board borders
-                if ($i == 0 || $i == 12 || $j == 0 || $j == 30) {
+                if ($i == 0 || $i == 12 || $j == 0 || $j == 26) {
                     $this->board[$i][$j] = Field::Border;
                 }
                 // Central unbreakable walls
                 else if ($i % 2 == 0 && $j % 2 == 0) {
                     $this->board[$i][$j] = Field::Border;
                 } else {
-                    if(in_array([$i, $j], $balloons_positions)){
-                        $balloon = new Balloon($i, $j, rand(0, 3));
+                    if (in_array([$j, $i], $balloons_positions)) {
+                        $balloon = new Balloon($j, $i, rand(0, 3));
                         $this->balloons[] = $balloon;
                         $this->board[$i][$j] = $balloon;
-                    } else{
+                    } else {
                         $this->board[$i][$j] = Field::Empty;
                     }
-                    // Randomly spawn baloons in empty spaces
-                    // if (rand(0, 100) < 1) {
-                    //     echo "$i $j\n";
-                    //     $balloon = new Balloon($i, $j, rand(0, 3));
-                    //     $this->balloons[] = $balloon;
-                    //     $this->board[$i][$j] = $balloon;
-                    // } else {
-                    //     $this->board[$i][$j] = Field::Empty;
-                    // }
                 }
             }
         }
         // Randomly fill empty spaces with obstacles
         for ($i = 0; $i < 13; $i++) {
-            for ($j = 0; $j < 31; $j++) {
+            for ($j = 0; $j < 27; $j++) {
                 if (
                     $this->board[$i][$j] == Field::Empty && rand(0, 100) < 20
                     // Make sure the player can move freely at the start
@@ -156,22 +153,24 @@ class GameManager
         }
         $this->board[1][1] = Field::Player;
     }
-    public function update_board(){
-        //remove all balloons from the board
+
+    public function update_board()
+    {
+        // Remove all balloons from the board
         for ($i = 0; $i < 13; $i++) {
-            for ($j = 0; $j < 31; $j++) {
-                if($this->board[$i][$j] instanceof Balloon){
+            for ($j = 0; $j < 27; $j++) {
+                if ($this->board[$i][$j] instanceof Balloon) {
                     $this->board[$i][$j] = Field::Empty;
                 }
             }
         }
+        // Add balloons to the board
         foreach ($this->balloons as $balloon) {
             $this->board[$balloon->y][$balloon->x] = $balloon;
             echo "Balloon at $balloon->x, $balloon->y\n";
         }
     }
 }
-
 class SocketServer
 {
     private $host;
