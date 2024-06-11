@@ -78,6 +78,11 @@ class Balloon
 
     public function move($board)
     {
+        if($this->move_percentage >= 100){
+            $this->move_percentage = 0;
+        } else {
+            $this->move_percentage += 20;
+        }
         if ($this->move_percentage == 0) {
             if ($this->is_legal_move($this->direction, $board) && rand(0, 100) < 80) {
                 list($new_x, $new_y) = $this->calculate_position_after_move($this->direction);

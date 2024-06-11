@@ -13,7 +13,7 @@ export enum Direction {
 
 export interface ServerResponse {
     id: string,
-    board: Array<Array<Field | Baloon>>
+    board: Array<Array<Field | Balloon>>
 }
 
 export class Balloon {
