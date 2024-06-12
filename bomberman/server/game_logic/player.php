@@ -1,6 +1,6 @@
 <?php
 
-class Player{
+class Player {
     public $discriminator = "player";
     public $id;
     public $x_px;
@@ -9,78 +9,115 @@ class Player{
     public $y;
     public $direction;
     public $animation_frame;
+    public $speed = 5;
 
-    public function __construct($id, $x, $y, $direction){
+    const TILE_SIZE = 32;
+    const CENTERING_TOLERANCE = 6; // pixels
+
+    public function __construct($id, $x, $y, $direction) {
         $this->id = $id;
         $this->x = $x;
         $this->y = $y;
-        $this->x_px = $x * 20;
-        $this->y_px = $y * 20;
+        $this->x_px = $x * self::TILE_SIZE;
+        $this->y_px = $y * self::TILE_SIZE;
         $this->direction = $direction;
         $this->animation_frame = 0;
     }
 
-    public function move($direction, $board){
-        if(!$this->check_if_move_legal($direction, $board)){
-            echo "ILLEGAL MOVE\n";
+    public function move($direction, $board) {
+// Center the player if the direction changes
+if ($this->direction != $direction) {
+    $this->snap_to_center();
+}
+
+        if (!$this->check_if_move_legal($direction, $board)) {
             return;
         }
-        // Animation
-        if($this->direction == $direction){
-            $this->animation_frame++;
-            if($this->animation_frame > 2){
-                $this->animation_frame = 0;
-            }
-        }else{
-            $this->animation_frame = 0;
+
+    
+        $this->direction = $direction;
+
+        switch ($direction) {
+            case Direction::Up:
+                $this->y_px -= $this->speed;
+                break;
+            case Direction::Right:
+                $this->x_px += $this->speed;
+                break;
+            case Direction::Down:
+                $this->y_px += $this->speed;
+                break;
+            case Direction::Left:
+                $this->x_px -= $this->speed;
+                break;
         }
 
-        // echo "Player $this->id moved $direction\n";
-        $this->direction = $direction;
-        switch ($direction) {
-            case Direction::Up:
-                $this->y_px -= 5;
-                break;
-            case Direction::Right:
-                $this->x_px += 5;
-                break;
-            case Direction::Down:
-                $this->y_px += 5;
-                break;
-            case Direction::Left:
-                $this->x_px -= 5;
-                break;
-        }
         $this->calculate_position_from_px();
     }
-    public function calculate_position_from_px(){
-        $this->x = floor($this->x_px / 32);
-        $this->y = floor($this->y_px / 32);
+
+    public function calculate_position_from_px() {
+        $this->x = floor($this->x_px / self::TILE_SIZE);
+        $this->y = floor($this->y_px / self::TILE_SIZE);
     }
-    public function check_if_move_legal($direction, $board){
-        $new_x = $this->x;
-        $new_y = $this->y;
+
+    public function check_if_move_legal($direction, $board) {
+        $new_x = $this->x_px;
+        $new_y = $this->y_px;
         switch ($direction) {
             case Direction::Up:
-                $new_y--;
+                $new_y -= $this->speed;
                 break;
             case Direction::Right:
-                $new_x++;
+                $new_x += $this->speed;
                 break;
             case Direction::Down:
-                $new_y++;
+                $new_y += $this->speed;
                 break;
             case Direction::Left:
-                $new_x--;
+                $new_x -= $this->speed;
                 break;
         }
-        if ($new_x < 0 || $new_x >= 27 || $new_y < 0 || $new_y >= 13) {
+
+        $new_x_tile = 0; $new_y_tile = 0;
+        if($direction == Direction::Down || $direction == Direction::Right){
+            $new_x_tile = ceil($new_x / self::TILE_SIZE);
+            $new_y_tile = ceil($new_y / self::TILE_SIZE);
+        } else {
+            $new_x_tile = floor($new_x / self::TILE_SIZE);
+            $new_y_tile = floor($new_y / self::TILE_SIZE);
+        }
+
+        echo "New pos $new_x_tile, $new_y_tile ($new_x, $new_y)\n";
+
+        // Ensure the new position is within the board boundaries
+        if ($new_x_tile < 0 || $new_x_tile >= count($board[0]) || $new_y_tile < 0 || $new_y_tile >= count($board)) {
+            echo "Out of bounds\n";
             return false;
         }
-        if ($board[$new_y][$new_x] == Field::Border || $board[$new_y][$new_x] == Field::Obstacle) {
+
+        // Check if the position is not a Border or Obstacle
+        if ($board[$new_y_tile][$new_x_tile] == Field::Border || $board[$new_y_tile][$new_x_tile] == Field::Obstacle) {
+            echo "Hit border or obstacle\n";
             return false;
         }
 
         return true;
+    }
+
+    private function snap_to_center() {
+        // calculate which tile is the closest to the player
+        $center_x = $this->x_px + self::TILE_SIZE / 2;
+        $center_y = $this->y_px + self::TILE_SIZE / 2;
+
+        $center_x_tile = floor($center_x / self::TILE_SIZE);
+        $center_y_tile = floor($center_y / self::TILE_SIZE);
+
+        $center_x_px = $center_x_tile * self::TILE_SIZE;
+        $center_y_px = $center_y_tile * self::TILE_SIZE;
+
+        $this->x_px = $center_x_px;
+        $this->y_px = $center_y_px;
+
+        $this->calculate_position_from_px();
     }
 }

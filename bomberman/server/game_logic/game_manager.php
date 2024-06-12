@@ -117,7 +117,8 @@ class GameManager
     }
     public function update_players(){
         foreach ($this->players as $player) {
-            $this->board[$player->y][$player->x] = $player;
+            if($this->board[$player->y][$player->x] == Field::Empty)
+                $this->board[$player->y][$player->x] = $player;
         }
     }
 }
