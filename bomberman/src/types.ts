@@ -17,6 +17,7 @@ export interface ServerResponse {
 }
 
 export class Balloon {
+    discriminator: 'balloon' = 'balloon';
     x: number;
     y: number;
     direction: Direction;
@@ -29,5 +30,23 @@ export class Balloon {
         this.direction = direction;
         this.move_percentage = move_percentage;
         this.last_horizontal_direction = last_horizontal_direction;
+    }
+}
+export class Player {
+    discriminator: 'player' = 'player';
+    x: number;
+    y: number;
+    x_px: number;
+    y_px: number;
+    direction: Direction;
+    animation_frame: number;
+
+    constructor(x: number, y: number, x_px: number, y_px: number) {
+        this.x = x;
+        this.y = y;
+        this.x_px = x_px;
+        this.y_px = y_px;
+        this.direction = Direction.Down;
+        this.animation_frame = 0;
     }
 }

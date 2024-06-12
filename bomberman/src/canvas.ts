@@ -1,4 +1,4 @@
-import { Balloon, Direction, Field } from "./types.ts";
+import {Balloon, Direction, Field, Player} from "./types.ts";
 
 const fieldImages = {
     [Field.Empty]: new Image(),
@@ -13,6 +13,13 @@ const balloonImages = {
     default: new Image()
 };
 
+const playerImages = {
+    [Direction.Up]: [new Image(), new Image(), new Image(), new Image()],
+    [Direction.Right]: [new Image(), new Image(), new Image(), new Image()],
+    [Direction.Down]: [new Image(), new Image(), new Image(), new Image()],
+    [Direction.Left]: [new Image(), new Image(), new Image(), new Image()]
+};
+
 //#region PRELOAD IMAGES
 fieldImages[Field.Empty].src = 'animations/background.png';
 fieldImages[Field.Border].src = 'animations/border.png';
@@ -24,22 +31,27 @@ for (let i = 0; i < 4; i++) {
     balloonImages.right[i].src = `animations/balloon/right_${i}.png`;
 }
 balloonImages.default.src = 'animations/balloon/balloon.png';
+
+for (let i = 0; i < 4; i++) {
+    playerImages[Direction.Up][i].src = `animations/player/up_${i}.png`;
+    playerImages[Direction.Right][i].src = `animations/player/right_${i}.png`;
+    playerImages[Direction.Down][i].src = `animations/player/down_${i}.png`;
+    playerImages[Direction.Left][i].src = `animations/player/left_${i}.png`;
+}
 //#endregion
 
 
-export function drawBoard(board: Array<Array<Field | Balloon>>, animation_tick: number): void {
+export function drawBoard(board: Array<Array<Field | Balloon | Player>>, animation_tick: number): void {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Draw the background and field images first
     drawFields(ctx, board);
-
-    // Draw the balloons after fields are drawn to avoid flickering
     drawBalloons(ctx, board, animation_tick);
+    drawPlayers(ctx, board);
 }
 
-function drawFields(ctx: CanvasRenderingContext2D, board: Array<Array<Field | Balloon>>) {
+function drawFields(ctx: CanvasRenderingContext2D, board: Array<Array<Field | Balloon | Player>>) {
     for (const [y, row] of board.entries()) {
         for (const [x, field] of row.entries()) {
             const image = fieldImages[field] || fieldImages.default;
@@ -48,11 +60,11 @@ function drawFields(ctx: CanvasRenderingContext2D, board: Array<Array<Field | Ba
     }
 }
 
-function drawBalloons(ctx: CanvasRenderingContext2D, board: Array<Array<Field | Balloon>>, animation_tick: number) {
+function drawBalloons(ctx: CanvasRenderingContext2D, board: Array<Array<Field | Balloon | Player>>, animation_tick: number) {
     for (const [y, row] of board.entries()) {
         for (const [x, field] of row.entries()) {
             let offsetY = 0, offsetX = 0;
-            if (typeof field === 'object') {
+            if (typeof field === 'object' && field.discriminator === 'balloon') {
                 const balloon = field as Balloon;
                 const balloon_animation_frame = Math.abs(2 - (animation_tick % 4));
                 let image = balloonImages.default;
@@ -84,11 +96,22 @@ function drawBalloons(ctx: CanvasRenderingContext2D, board: Array<Array<Field | 
         }
     }
 }
+function drawPlayers(ctx: CanvasRenderingContext2D, board: Array<Array<Field | Balloon | Player>>){
+    for(const [y, row] of board.entries()){
+        for(const [x, field] of row.entries()){
+            if(typeof field === 'object' && field.discriminator === 'player'){
+                const player = field as Player;
+                const image = playerImages[player.direction][player.animation_frame];
+                ctx.drawImage(image, player.x_px, player.y_px, 32, 32);
+            }
+        }
+    }
+}
 
-export function balloonsSmoothMove(board: Array<Array<Field | Balloon>>){
+export function balloonsSmoothMoveStep(board: Array<Array<Field | Balloon | Player>>){
     for (const [y, row] of board.entries()) {
         for (const [x, field] of row.entries()) {
-            if (typeof field === 'object') {
+            if (typeof field === 'object' && field.discriminator === 'balloon') {
                 const balloon = field as Balloon;
                 balloon.move_percentage += 1.5;
                 board[y][x] = balloon;

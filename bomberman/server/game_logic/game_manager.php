@@ -1,11 +1,13 @@
 <?php
 require_once("types.php");
 require_once("balloon.php");
+require_once("player.php");
 
 class GameManager
 {
     public $board = array();
     public $balloons = array();
+    public $players = array();
     public $max_balloon_count = 15;
 
     public function initialise_board()
@@ -60,6 +62,31 @@ class GameManager
         // Add balloons to the board
         foreach ($this->balloons as $balloon) {
             $this->board[$balloon->y][$balloon->x] = $balloon;
+        }
+    }
+
+    public function spawn_player($id){
+        $player = new Player($id, 0, 0, Direction::Down);
+        $player->id = $id;
+        // Find empty spot for player
+        do {
+            $player->x = rand(0, 26);
+            $player->y = rand(0, 12);
+        } while ($this->board[$player->y][$player->x] != Field::Empty);
+
+        $player->x_px = $player->x * 32;
+        $player->y_px = $player->y * 32;
+
+        $this->players[] = $player;
+        $this->board[$player->y][$player->x] = $player;
+    }
+    public function despawn_player($id){
+        foreach ($this->players as $key => $player) {
+            if($player->id == $id){
+                $this->board[$player->y][$player->x] = Field::Empty;
+                unset($this->players[$key]);
+                break;
+            }
         }
     }
 }

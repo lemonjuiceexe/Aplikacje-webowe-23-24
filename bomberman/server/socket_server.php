@@ -41,6 +41,7 @@ class SocketServer
                 $new_client_id = uniqid();
                 $this->clients[] = $client;
                 $this->players[$new_client_id] = $client;
+                $this->game_manager->spawn_player($new_client_id);
 
                 stream_set_blocking($client, true);
                 $headers = fread($client, 1500);
@@ -73,6 +74,12 @@ class SocketServer
                     @fclose($changed_socket);
                     $found_socket = array_search($changed_socket, $this->clients);
                     unset($this->clients[$found_socket]);
+                    foreach ($this->players as $player_id => $player) {
+                        if ($player == $changed_socket) {
+                            $this->game_manager->despawn_player($player_id);
+                            unset($this->players[$player_id]);
+                        }
+                    }
                 }
 
                 $unmasked = $this->unmask($buffer);
@@ -86,7 +93,7 @@ class SocketServer
                 // Send the current board and client ID to all clients every tick
                 foreach ($this->players as $player_id => $player) {
                     if ($player == $changed_socket) {
-                        echo "Player $player_id moved\n";
+                        echo "Player $player_id sent message: $unmasked\n";
 
                         $data = json_encode([
                             "id" => $player_id,

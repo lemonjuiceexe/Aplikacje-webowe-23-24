@@ -3,6 +3,7 @@ require_once("types.php");
 
 class Balloon
 {
+    public $discriminator = "balloon";
     public $x;
     public $y;
     public $direction;
@@ -48,21 +49,17 @@ class Balloon
     public function is_legal_move($direction, $board)
     {
         list($new_x, $new_y) = $this->calculate_position_after_move($direction);
-        echo "Checking move to $new_x, $new_y\n";
 
         // Ensure the new position is within the board boundaries
         if ($new_x < 0 || $new_x >= count($board[0]) || $new_y < 0 || $new_y >= count($board)) {
-            echo "Out of bounds\n";
             return false;
         }
 
         // Check if the position is not a Border or Obstacle
         if ($board[$new_y][$new_x] == Field::Border || $board[$new_y][$new_x] == Field::Obstacle) {
-            echo "Obstacle\n";
             return false;
         }
 
-        echo "Legal move\n";
         return true;
     }
 
@@ -80,6 +77,10 @@ class Balloon
         } else{
             $this->direction = null;
         }
+
+        if (in_array($this->direction, [Direction::Right, Direction::Left])) {
+            $this->last_horizontal_direction = $this->direction;
+        }
     }
     public function move($board)
     {
@@ -87,9 +88,11 @@ class Balloon
         if(!$this->is_legal_move($this->direction, $board)){
             $this->choose_new_direction($board);
         }
+        // if there's still no legal direction, don't move 
         if(!$this->is_legal_move($this->direction, $board)){
             return;
         }
+
         if($this->move_percentage >= 100){
             $this->move_percentage = 0;
         } else {
