@@ -83,9 +83,9 @@ class SocketServer
                 }
 
                 $unmasked = $this->unmask($buffer);
-                if ($unmasked != "") {
-                    echo "\nReceived a Message from $ip:\n\"$unmasked\" \n";
-                }
+                // if ($unmasked != "") {
+                    // echo "\nReceived a Message from $ip:\n\"$unmasked\" \n";
+                // }
 
                 $response = $this->mask($unmasked);
                 $this->send_message($this->clients, $response);
@@ -93,7 +93,10 @@ class SocketServer
                 // Send the current board and client ID to all clients every tick
                 foreach ($this->players as $player_id => $player) {
                     if ($player == $changed_socket) {
-                        echo "Player $player_id sent message: $unmasked\n";
+                        // echo "Player $player_id sent message: $unmasked\n";
+                        if(isset(json_decode($unmasked)->key)){
+                            $this->game_manager->move_player($player_id, json_decode($unmasked)->key);
+                        }
 
                         $data = json_encode([
                             "id" => $player_id,

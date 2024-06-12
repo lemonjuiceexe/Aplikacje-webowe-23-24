@@ -89,4 +89,35 @@ class GameManager
             }
         }
     }
+    public function move_player($id, $key){
+        $direction = null;
+        switch ($key) {
+            case "ArrowUp":
+                $direction = Direction::Up;
+                break;
+            case "ArrowRight":
+                $direction = Direction::Right;
+                break;
+            case "ArrowDown":
+                $direction = Direction::Down;
+                break;
+            case "ArrowLeft":
+                $direction = Direction::Left;
+                break;
+        }
+
+        foreach ($this->players as $key => $player) {
+            if($player->id == $id){
+                $player->move($direction, $this->board);
+                break;
+            }
+        }
+        $this->update_players();
+
+    }
+    public function update_players(){
+        foreach ($this->players as $player) {
+            $this->board[$player->y][$player->x] = $player;
+        }
+    }
 }

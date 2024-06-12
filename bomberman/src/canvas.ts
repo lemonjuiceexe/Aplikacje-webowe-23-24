@@ -17,7 +17,8 @@ const playerImages = {
     [Direction.Up]: [new Image(), new Image(), new Image(), new Image()],
     [Direction.Right]: [new Image(), new Image(), new Image(), new Image()],
     [Direction.Down]: [new Image(), new Image(), new Image(), new Image()],
-    [Direction.Left]: [new Image(), new Image(), new Image(), new Image()]
+    [Direction.Left]: [new Image(), new Image(), new Image(), new Image()],
+    default: new Image()
 };
 
 //#region PRELOAD IMAGES
@@ -32,12 +33,13 @@ for (let i = 0; i < 4; i++) {
 }
 balloonImages.default.src = 'animations/balloon/balloon.png';
 
-for (let i = 0; i < 4; i++) {
+for (let i = 0; i < 3; i++) {
     playerImages[Direction.Up][i].src = `animations/player/up_${i}.png`;
     playerImages[Direction.Right][i].src = `animations/player/right_${i}.png`;
     playerImages[Direction.Down][i].src = `animations/player/down_${i}.png`;
     playerImages[Direction.Left][i].src = `animations/player/left_${i}.png`;
 }
+playerImages.default.src = 'animations/player/down_0.png';
 //#endregion
 
 
