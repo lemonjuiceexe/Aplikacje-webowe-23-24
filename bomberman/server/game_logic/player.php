@@ -9,7 +9,7 @@ class Player {
     public $y;
     public $direction;
     public $animation_frame;
-    public $speed = 5;
+    public $speed = 2;
 
     const TILE_SIZE = 32;
     const CENTERING_TOLERANCE = 6; // pixels
@@ -25,16 +25,15 @@ class Player {
     }
 
     public function move($direction, $board) {
-// Center the player if the direction changes
-if ($this->direction != $direction) {
-    $this->snap_to_center();
-}
+        // Center the player if the direction changes
+        if ($this->direction != $direction) {
+            $this->snap_to_center();
+        }
 
         if (!$this->check_if_move_legal($direction, $board)) {
             return;
         }
 
-    
         $this->direction = $direction;
 
         switch ($direction) {
@@ -51,8 +50,10 @@ if ($this->direction != $direction) {
                 $this->x_px -= $this->speed;
                 break;
         }
-
         $this->calculate_position_from_px();
+
+        $this->animation_frame = ($this->animation_frame + 1) % 3;
+        echo "Increment anim to $this->animation_frame\n";
     }
 
     public function calculate_position_from_px() {
@@ -87,17 +88,13 @@ if ($this->direction != $direction) {
             $new_y_tile = floor($new_y / self::TILE_SIZE);
         }
 
-        echo "New pos $new_x_tile, $new_y_tile ($new_x, $new_y)\n";
-
         // Ensure the new position is within the board boundaries
         if ($new_x_tile < 0 || $new_x_tile >= count($board[0]) || $new_y_tile < 0 || $new_y_tile >= count($board)) {
-            echo "Out of bounds\n";
             return false;
         }
 
         // Check if the position is not a Border or Obstacle
         if ($board[$new_y_tile][$new_x_tile] == Field::Border || $board[$new_y_tile][$new_x_tile] == Field::Obstacle) {
-            echo "Hit border or obstacle\n";
             return false;
         }
 
