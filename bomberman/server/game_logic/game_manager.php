@@ -22,6 +22,7 @@ class GameManager
                     $this->board[$i][$j] = Field::Border;
                 } else {
                     if (count($this->balloons) < $this->max_balloon_count && rand(0, 100) < 10) {
+                    // if($i == 1 && $j == 1) {
                         $balloon = new Balloon($j, $i, rand(0, 3));
                         $this->balloons[] = $balloon;
                         $this->board[$i][$j] = $balloon;
@@ -59,7 +60,6 @@ class GameManager
         // Add balloons to the board
         foreach ($this->balloons as $balloon) {
             $this->board[$balloon->y][$balloon->x] = $balloon;
-            echo "Balloon at $balloon->x, $balloon->y\n";
         }
     }
 }

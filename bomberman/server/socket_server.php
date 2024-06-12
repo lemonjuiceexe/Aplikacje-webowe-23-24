@@ -103,7 +103,6 @@ class SocketServer
             }
 
             // Move balloons every tick
-            echo "There are " . count($this->game_manager->balloons) . " balloons\n";
             foreach ($this->game_manager->balloons as $balloon) {
                 $balloon->move($this->game_manager->board);
             }
