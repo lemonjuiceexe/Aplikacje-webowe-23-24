@@ -34,7 +34,3 @@ socket.addEventListener('close', (_) => {
 socket.addEventListener('error', (event) => {
     console.error('Connection error:', event);
 });
-
-document.querySelector("#btn")!.addEventListener("click", () => {
-    socket.send("i have been clicked");
-});
