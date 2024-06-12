@@ -77,6 +77,8 @@ class Balloon
 
         if (!empty($possible_directions)) {
             $this->direction = $possible_directions[array_rand($possible_directions)];
+        } else{
+            $this->direction = null;
         }
     }
     public function move($board)
@@ -84,6 +86,9 @@ class Balloon
         // check if move in the current direction is possible
         if(!$this->is_legal_move($this->direction, $board)){
             $this->choose_new_direction($board);
+        }
+        if(!$this->is_legal_move($this->direction, $board)){
+            return;
         }
         if($this->move_percentage >= 100){
             $this->move_percentage = 0;
