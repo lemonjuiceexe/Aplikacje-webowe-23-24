@@ -8,7 +8,8 @@ class SocketServer
     private $game_manager;
     private $players;
 
-    private $tick_time = 1;
+    private $tick_interval = 1; // seconds
+    private $last_tick_time;
 
     public function __construct($host, $port, $game_manager)
     {
@@ -21,6 +22,7 @@ class SocketServer
         }
         $this->clients = array($this->server);
         $this->players = array();
+        $this->last_tick_time = microtime(true);
     }
 
     public function run()
@@ -30,14 +32,29 @@ class SocketServer
 
         while (true) {
             $changed = $this->clients;
-            stream_select($changed, $write, $except, $this->tick_time);
+            stream_select($changed, $write, $except, 0, 10000); // 10 ms timeout for message processing
 
-            if (in_array($this->server, $changed)) {
-                $client = @stream_socket_accept($this->server);
-                if (!$client) {
-                    continue;
-                }
+            // Handle incoming messages
+            $this->handleIncomingMessages($changed);
 
+            // Handle tick updates
+            $current_time = microtime(true);
+            if ($current_time - $this->last_tick_time >= $this->tick_interval) {
+                $this->handleTick();
+                $this->last_tick_time = $current_time;
+            }
+
+            // Limit the loop execution to avoid high CPU usage
+            usleep(10000); // 10 ms delay to prevent high CPU usage
+        }
+        fclose($this->server);
+    }
+
+    private function handleIncomingMessages($changed)
+    {
+        if (in_array($this->server, $changed)) {
+            $client = @stream_socket_accept($this->server);
+            if ($client) {
                 $new_client_id = uniqid();
                 $this->clients[] = $client;
                 $this->players[$new_client_id] = $client;
@@ -54,80 +71,62 @@ class SocketServer
                     "board" => $this->game_manager->board
                 ]);
 
-                $this->send_message(
-                    $this->clients,
-                    $this->mask(
-                        $data
-                    )
-                );
-
-                $found_socket = array_search($this->server, $changed);
-                unset($changed[$found_socket]);
+                $this->send_message($this->clients, $this->mask($data));
             }
+            $found_socket = array_search($this->server, $changed);
+            unset($changed[$found_socket]);
+        }
 
-            foreach ($changed as $changed_socket) {
-                $ip = stream_socket_get_name($changed_socket, true);
-                $buffer = stream_get_contents($changed_socket);
+        foreach ($changed as $changed_socket) {
+            $ip = stream_socket_get_name($changed_socket, true);
+            $buffer = stream_get_contents($changed_socket);
 
-                if ($buffer == false) {
-                    echo "Client Disconnected from $ip\n";
-                    @fclose($changed_socket);
-                    $found_socket = array_search($changed_socket, $this->clients);
-                    unset($this->clients[$found_socket]);
-                    foreach ($this->players as $player_id => $player) {
-                        if ($player == $changed_socket) {
-                            $this->game_manager->despawn_player($player_id);
-                            unset($this->players[$player_id]);
-                        }
-                    }
-                }
-
-                $unmasked = $this->unmask($buffer);
-                // if ($unmasked != "") {
-                    // echo "\nReceived a Message from $ip:\n\"$unmasked\" \n";
-                // }
-
-                $response = $this->mask($unmasked);
-                $this->send_message($this->clients, $response);
-
-                // Send the current board and client ID to all clients every tick
+            if ($buffer === false) {
+                echo "Client Disconnected from $ip\n";
+                @fclose($changed_socket);
+                $found_socket = array_search($changed_socket, $this->clients);
+                unset($this->clients[$found_socket]);
                 foreach ($this->players as $player_id => $player) {
                     if ($player == $changed_socket) {
-                        // echo "Player $player_id sent message: $unmasked\n";
-                        if(isset(json_decode($unmasked)->key)){
+                        $this->game_manager->despawn_player($player_id);
+                        unset($this->players[$player_id]);
+                    }
+                }
+            } else {
+                $unmasked = $this->unmask($buffer);
+
+                // Process the player's move
+                foreach ($this->players as $player_id => $player) {
+                    if ($player == $changed_socket) {
+                        if (isset(json_decode($unmasked)->key)) {
                             $this->game_manager->move_player($player_id, json_decode($unmasked)->key);
                         }
 
+                        // Send the updated board and player ID to all clients
                         $data = json_encode([
                             "id" => $player_id,
                             "board" => $this->game_manager->board
                         ]);
-                        $this->send_message(
-                            $this->clients,
-                            $this->mask(
-                                $data
-                            )
-                        );
+                        $this->send_message($this->clients, $this->mask($data));
                     }
                 }
             }
-
-            // Move balloons every tick
-            foreach ($this->game_manager->balloons as $balloon) {
-                $balloon->move($this->game_manager->board);
-            }
-            $this->game_manager->update_board();
-
-            // Send the current board to all clients every tick
-            $data = json_encode([
-                "board" => $this->game_manager->board
-            ]);
-            $this->send_message(
-                $this->clients,
-                $this->mask($data)
-            );
         }
-        fclose($this->server);
+    }
+
+    private function handleTick()
+    {
+        // Move balloons every tick
+        foreach ($this->game_manager->balloons as $balloon) {
+            $balloon->move($this->game_manager->board);
+        }
+        $this->game_manager->update_board();
+
+        // Send the current board to all clients every tick
+        $data = json_encode([
+            "board" => $this->game_manager->board
+        ]);
+        $this->send_message($this->clients, $this->mask($data));
     }
 
     private function unmask($text)
@@ -149,6 +148,7 @@ class SocketServer
         }
         return $text;
     }
+
     private function mask($text)
     {
         $b1 = 0x80 | (0x1 & 0x0f);
@@ -161,6 +161,7 @@ class SocketServer
             $header = pack('CCNN', $b1, 127, $length);
         return $header . $text;
     }
+
     private function handshake($client, $rcvd, $host, $port)
     {
         $headers = array();
