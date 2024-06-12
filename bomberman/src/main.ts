@@ -1,4 +1,4 @@
-import { drawBoard } from "./canvas.ts";
+import {balloonsSmoothMove, drawBoard} from "./canvas.ts";
 
 import './style.css';
 import {Balloon, Field, ServerResponse} from "./types.ts";
@@ -9,8 +9,9 @@ let board: Array<Array<Field | Balloon>> = [];
 let animation_tick = 0;
 
 setInterval(() => {
+    balloonsSmoothMove(board);
     drawBoard(board, animation_tick++);
-}, 500);
+}, 100);
 
 socket.onopen = () => {
     console.log('Connection with server established');
