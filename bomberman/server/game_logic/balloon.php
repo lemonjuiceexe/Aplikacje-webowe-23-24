@@ -96,7 +96,7 @@ class Balloon
         if($this->move_percentage >= 100){
             $this->move_percentage = 0;
         } else {
-            $this->move_percentage += 20;
+            $this->move_percentage += 1;
         }
         if ($this->move_percentage == 0) {
             if ($this->is_legal_move($this->direction, $board) && rand(0, 100) < 80) {

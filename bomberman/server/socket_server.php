@@ -8,7 +8,7 @@ class SocketServer
     private $game_manager;
     private $players;
 
-    private $tick_interval = 1; // seconds
+    private $tick_interval = 0.02; // seconds
     private $last_tick_time;
 
     public function __construct($host, $port, $game_manager)
@@ -122,12 +122,28 @@ class SocketServer
         }
         $this->game_manager->update_board();
 
-        // Send the current board to all clients every tick
+        // Send the current board and balloon states to all clients every tick
         $data = json_encode([
-            "board" => $this->game_manager->board
+            "board" => $this->game_manager->board,
+            "balloons" => $this->getBalloonsData()
         ]);
         $this->send_message($this->clients, $this->mask($data));
     }
+
+    private function getBalloonsData()
+    {
+        return array_map(function ($balloon) {
+            return [
+                'x' => $balloon->x,
+                'y' => $balloon->y,
+                'direction' => $balloon->direction,
+                'last_horizontal_direction' => $balloon->last_horizontal_direction,
+                'move_percentage' => $balloon->move_percentage
+            ];
+        }, $this->game_manager->balloons);
+    }
+
+
 
     private function unmask($text)
     {
