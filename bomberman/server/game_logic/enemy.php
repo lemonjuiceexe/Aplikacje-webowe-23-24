@@ -204,11 +204,6 @@ class Garlic extends Balloon
             }
         }
 
-        // If player is not found (should not reach here in a well-formed problem)
-        if (!$foundPlayer) {
-            return null;
-        }
-
         // Backtrack from player's position to find the starting point of the shortest path
         $currentX = $playerX;
         $currentY = $playerY;
@@ -223,24 +218,13 @@ class Garlic extends Balloon
         return $this->calculate_direction($start_x, $start_y, $currentX, $currentY);
     }
 
-    // private function find_player_coords($board) {
-    //     for ($i = 0; $i < count($board); $i++) {
-    //         for ($j = 0; $j < count($board[0]); $j++) {
-    //             if (is_object($board[$i][$j]) && $board[$i][$j]->discriminator == "player") {
-    //                 return [$j, $i];
-    //             }
-    //         }
-    //     }
-    //     return [null, null]; // Player not found
-    // }
-
     public function choose_new_direction($board)
     {
         // list($player_x, $player_y) = $this->find_player_coords($board);
         // echo "Player coords: $player_x, $player_y\n";
         // if ($player_x !== null && $player_y !== null) {
         $direction = $this->findShortestPathDirection($board, $this->x, $this->y);
-        if ($this->is_legal_move($direction, $board) && $direction != null) {
+        if ($direction != null && $direction != -1) {
             echo "Chose: $direction\n";
             $this->direction = $direction;
         } else {

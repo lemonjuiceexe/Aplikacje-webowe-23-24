@@ -59,7 +59,7 @@ class GameManager
         // Remove all balloons from the board
         for ($i = 0; $i < 13; $i++) {
             for ($j = 0; $j < 27; $j++) {
-                if ($this->board[$i][$j] instanceof Balloon || $this->board[$i][$j] instanceof Garlic) {
+                if ($this->board[$i][$j] instanceof Balloon || $this->board[$i][$j] instanceof Garlic || $this->board[$i][$j] instanceof Player) {
                     $this->board[$i][$j] = Field::Empty;
                 }
             }
@@ -70,6 +70,9 @@ class GameManager
         }
         foreach ($this->garlics as $garlic) {
             $this->board[$garlic->y][$garlic->x] = $garlic;
+        }
+        foreach ($this->players as $player) {
+            $this->board[$player->y][$player->x] = $player;
         }
     }
 
@@ -124,6 +127,13 @@ class GameManager
 
     }
     public function update_players(){
+        for ($i = 0; $i < 13; $i++) {
+            for ($j = 0; $j < 27; $j++) {
+                if (is_object($this->board[$i][$j]) && $this->board[$i][$j]->discriminator == "player") {
+                    $this->board[$i][$j] = Field::Empty;
+                }
+            }
+        }
         foreach ($this->players as $player) {
             if($this->board[$player->y][$player->x] == Field::Empty){
                 $this->board[$player->y][$player->x] = $player;

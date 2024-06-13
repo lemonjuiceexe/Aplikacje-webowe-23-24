@@ -2,7 +2,6 @@ export enum Field {
     Empty = "-",
     Border = "*",
     Obstacle = "X",
-    Player = "P",
 }
 export enum Direction {
     Up = 0,
