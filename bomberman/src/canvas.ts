@@ -43,6 +43,7 @@ for (let i = 0; i < 3; i++) {
     garlicImages.left[i].src = `animations/garlic/left_${i}.png`;
     garlicImages.right[i].src = `animations/garlic/right_${i}.png`;
 }
+garlicImages.default.src = 'animations/garlic/garlic.png';
 
 for (let i = 0; i < 3; i++) {
     playerImages[Direction.Up][i].src = `animations/player/up_${i}.png`;
@@ -116,7 +117,7 @@ function drawGarlics(ctx: CanvasRenderingContext2D, board: Array<Array<Field | B
             let offsetY = 0, offsetX = 0;
             if (typeof field === 'object' && field.discriminator === 'garlic') {
                 const garlic = field as Balloon;
-                const garlic_animation_frame = Math.abs(1 - (animation_tick % 3));
+                const garlic_animation_frame = Math.abs(1 - (animation_tick % 4));
                 let image = garlicImages.default;
                 switch (garlic.last_horizontal_direction) {
                     case Direction.Left:
