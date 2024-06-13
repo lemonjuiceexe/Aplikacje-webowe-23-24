@@ -115,7 +115,7 @@ export function balloonsSmoothMoveStep(board: Array<Array<Field | Balloon | Play
         for (const [x, field] of row.entries()) {
             if (typeof field === 'object' && field.discriminator === 'balloon') {
                 const balloon = field as Balloon;
-                balloon.move_percentage += 2;
+                balloon.move_percentage += .5;
                 board[y][x] = balloon;
             }
         }

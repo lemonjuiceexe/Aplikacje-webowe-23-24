@@ -22,7 +22,14 @@ socket.addEventListener('message', (event) => {
     const response: ServerResponse = JSON.parse(event.data);
     // console.log('Received from server:', response);
     board = response.board;
-    // balloonsSmoothMoveStep(board);
+    board.map(row => row.map(field => {
+        if (field instanceof Balloon) {
+            field.move_percentage = 0;
+        }
+
+        return field;
+    }));
+    balloonsSmoothMoveStep(board);
     drawBoard(board, animation_tick);
 });
 

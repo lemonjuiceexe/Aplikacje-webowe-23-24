@@ -1,5 +1,5 @@
 <?php
-require_once("types.php");
+require_once ("types.php");
 
 class Balloon
 {
@@ -64,7 +64,8 @@ class Balloon
     }
 
 
-    function choose_new_direction($board){
+    function choose_new_direction($board)
+    {
         $possible_directions = [];
         foreach ([Direction::Up, Direction::Right, Direction::Down, Direction::Left] as $dir) {
             if ($this->is_legal_move($dir, $board)) {
@@ -74,7 +75,7 @@ class Balloon
 
         if (!empty($possible_directions)) {
             $this->direction = $possible_directions[array_rand($possible_directions)];
-        } else{
+        } else {
             $this->direction = null;
         }
 
@@ -93,19 +94,17 @@ class Balloon
             return;
         }
 
-        if($this->move_percentage >= 100){
-            $this->move_percentage = 0;
-        } else {
-            $this->move_percentage += 1;
-        }
-        if ($this->move_percentage == 0) {
+        $this->move_percentage += 2;
+        if ($this->move_percentage >= 100) {
+            list($new_x, $new_y) = $this->calculate_position_after_move($this->direction);
+            $this->y = $new_y;
+            $this->x = $new_x;
             if ($this->is_legal_move($this->direction, $board) && rand(0, 100) < 80) {
-                list($new_x, $new_y) = $this->calculate_position_after_move($this->direction);
-                $this->x = $new_x;
-                $this->y = $new_y;
             } else {
                 $this->choose_new_direction($board);
             }
+
+            $this->move_percentage = 0;
         }
     }
 }

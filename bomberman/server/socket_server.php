@@ -68,7 +68,8 @@ class SocketServer
                 // Initial message after connecting
                 $data = json_encode([
                     "id" => $new_client_id,
-                    "board" => $this->game_manager->board
+                    "board" => $this->game_manager->board,
+                    "balloons" => $this->getBalloonsData()
                 ]);
 
                 $this->send_message($this->clients, $this->mask($data));
@@ -105,7 +106,8 @@ class SocketServer
                         // Send the updated board and player ID to all clients
                         $data = json_encode([
                             "id" => $player_id,
-                            "board" => $this->game_manager->board
+                            "board" => $this->game_manager->board,
+                            "balloons" => $this->getBalloonsData()
                         ]);
                         $this->send_message($this->clients, $this->mask($data));
                     }
@@ -119,7 +121,7 @@ class SocketServer
         // Move balloons every tick
         foreach ($this->game_manager->balloons as $balloon) {
             $balloon->move($this->game_manager->board);
-        }
+            }
         $this->game_manager->update_board();
 
         // Send the current board and balloon states to all clients every tick
