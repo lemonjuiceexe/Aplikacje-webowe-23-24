@@ -53,7 +53,6 @@ class Player {
         $this->calculate_position_from_px();
 
         $this->animation_frame = ($this->animation_frame + 1) % 3;
-        echo "Increment anim to $this->animation_frame\n";
     }
 
     public function calculate_position_from_px() {

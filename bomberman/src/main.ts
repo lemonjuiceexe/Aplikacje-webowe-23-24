@@ -20,9 +20,10 @@ socket.onopen = () => {
 // Event listener for receiving messages from the server
 socket.addEventListener('message', (event) => {
     const response: ServerResponse = JSON.parse(event.data);
-    console.log('Received from server:', response);
+    // console.log('Received from server:', response);
     board = response.board;
-    // drawBoard(response.board);
+    // balloonsSmoothMoveStep(board);
+    drawBoard(board, animation_tick);
 });
 
 // Event listener for when the connection is closed
