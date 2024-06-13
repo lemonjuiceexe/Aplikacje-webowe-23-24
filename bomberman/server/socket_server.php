@@ -118,10 +118,14 @@ class SocketServer
 
     private function handleTick()
     {
+        // print_r($this->game_manager->board);
         // Move balloons every tick
         foreach ($this->game_manager->balloons as $balloon) {
             $balloon->move($this->game_manager->board);
-            }
+        }
+        foreach($this->game_manager->garlics as $garlic){
+            $garlic->move($this->game_manager->board);
+        }
         $this->game_manager->update_board();
 
         // Send the current board and balloon states to all clients every tick

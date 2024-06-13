@@ -1,7 +1,7 @@
 import {balloonsSmoothMoveStep, drawBoard} from "./canvas.ts";
 
 import './style.css';
-import {Balloon, Field, Player, ServerResponse} from "./types.ts";
+import {Balloon, Field, Garlic, Player, ServerResponse} from "./types.ts";
 
 const socket = new WebSocket('ws://127.0.0.1:46089');
 
@@ -22,13 +22,14 @@ socket.addEventListener('message', (event) => {
     const response: ServerResponse = JSON.parse(event.data);
     // console.log('Received from server:', response);
     board = response.board;
-    board.map(row => row.map(field => {
-        if (field instanceof Balloon) {
-            field.move_percentage = 0;
-        }
-
-        return field;
-    }));
+    // board.map(row => row.map(field => {
+    //     if (field instanceof Balloon) {
+    //         field.move_percentage = 0;
+    //     }
+    //
+    //     return field;
+    // }));
+    console.log(board.flat().filter(field => typeof field === 'object' && field.discriminator === 'garlic')[0].direction);
     balloonsSmoothMoveStep(board);
     drawBoard(board, animation_tick);
 });

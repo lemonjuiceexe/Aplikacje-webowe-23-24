@@ -1,14 +1,16 @@
 <?php
 require_once("types.php");
-require_once("balloon.php");
+require_once("enemy.php");
 require_once("player.php");
 
 class GameManager
 {
     public $board = array();
     public $balloons = array();
+    public $garlics = array();
     public $players = array();
     public $max_balloon_count = 15;
+    public $max_garlic_count = 1;
 
     public function initialise_board()
     {
@@ -20,14 +22,18 @@ class GameManager
                     $this->board[$i][$j] = Field::Border;
                 }
                 // Central unbreakable walls
-                else if ($i % 2 == 0 && $j % 2 == 0) {
+                elseif ($i % 2 == 0 && $j % 2 == 0) {
                     $this->board[$i][$j] = Field::Border;
                 } else {
                     if (count($this->balloons) < $this->max_balloon_count && rand(0, 100) < 10) {
-                    // if($i == 1 && $j == 1) {
                         $balloon = new Balloon($j, $i, rand(0, 3));
                         $this->balloons[] = $balloon;
                         $this->board[$i][$j] = $balloon;
+                    }
+                    else if (count($this->garlics) < $this->max_garlic_count && rand(0, 100) < 10) {
+                        $garlic = new Garlic($j, $i, rand(0, 3));
+                        $this->garlics[] = $garlic;
+                        $this->board[$i][$j] = $garlic;
                     } else {
                         $this->board[$i][$j] = Field::Empty;
                     }
@@ -46,7 +52,6 @@ class GameManager
                 }
             }
         }
-        $this->board[1][1] = Field::Player;
     }
 
     public function update_board()
@@ -54,7 +59,7 @@ class GameManager
         // Remove all balloons from the board
         for ($i = 0; $i < 13; $i++) {
             for ($j = 0; $j < 27; $j++) {
-                if ($this->board[$i][$j] instanceof Balloon) {
+                if ($this->board[$i][$j] instanceof Balloon || $this->board[$i][$j] instanceof Garlic) {
                     $this->board[$i][$j] = Field::Empty;
                 }
             }
@@ -62,6 +67,9 @@ class GameManager
         // Add balloons to the board
         foreach ($this->balloons as $balloon) {
             $this->board[$balloon->y][$balloon->x] = $balloon;
+        }
+        foreach ($this->garlics as $garlic) {
+            $this->board[$garlic->y][$garlic->x] = $garlic;
         }
     }
 
@@ -118,7 +126,7 @@ class GameManager
     public function update_players(){
         foreach ($this->players as $player) {
             if($this->board[$player->y][$player->x] == Field::Empty){
-                // $this->board[$player->y][$player->x] = $player;
+                $this->board[$player->y][$player->x] = $player;
             }
         }
     }

@@ -17,7 +17,7 @@ export interface ServerResponse {
 }
 
 export class Balloon {
-    discriminator: 'balloon' = 'balloon';
+    discriminator: string = 'balloon';
     x: number;
     y: number;
     direction: Direction;
@@ -32,6 +32,10 @@ export class Balloon {
         this.last_horizontal_direction = last_horizontal_direction;
     }
 }
+export class Garlic extends Balloon {
+    discriminator: string = 'garlic';
+};
+
 export class Player {
     discriminator: 'player' = 'player';
     x: number;

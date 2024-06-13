@@ -13,6 +13,12 @@ const balloonImages = {
     default: new Image()
 };
 
+const garlicImages = {
+    left: [new Image(), new Image(), new Image()],
+    right: [new Image(), new Image(), new Image()],
+    default: new Image()
+};
+
 const playerImages = {
     [Direction.Up]: [new Image(), new Image(), new Image(), new Image()],
     [Direction.Right]: [new Image(), new Image(), new Image(), new Image()],
@@ -34,6 +40,11 @@ for (let i = 0; i < 4; i++) {
 balloonImages.default.src = 'animations/balloon/balloon.png';
 
 for (let i = 0; i < 3; i++) {
+    garlicImages.left[i].src = `animations/garlic/left_${i}.png`;
+    garlicImages.right[i].src = `animations/garlic/right_${i}.png`;
+}
+
+for (let i = 0; i < 3; i++) {
     playerImages[Direction.Up][i].src = `animations/player/up_${i}.png`;
     playerImages[Direction.Right][i].src = `animations/player/right_${i}.png`;
     playerImages[Direction.Down][i].src = `animations/player/down_${i}.png`;
@@ -50,6 +61,7 @@ export function drawBoard(board: Array<Array<Field | Balloon | Player>>, animati
 
     drawFields(ctx, board);
     drawBalloons(ctx, board, animation_tick);
+    drawGarlics(ctx, board, animation_tick);
     drawPlayers(ctx, board);
 }
 
@@ -98,9 +110,47 @@ function drawBalloons(ctx: CanvasRenderingContext2D, board: Array<Array<Field | 
         }
     }
 }
+function drawGarlics(ctx: CanvasRenderingContext2D, board: Array<Array<Field | Balloon | Player>>, animation_tick: number) {
+    for (const [y, row] of board.entries()) {
+        for (const [x, field] of row.entries()) {
+            let offsetY = 0, offsetX = 0;
+            if (typeof field === 'object' && field.discriminator === 'garlic') {
+                const garlic = field as Balloon;
+                const garlic_animation_frame = Math.abs(1 - (animation_tick % 3));
+                let image = garlicImages.default;
+                switch (garlic.last_horizontal_direction) {
+                    case Direction.Left:
+                        image = garlicImages.left[garlic_animation_frame];
+                        break;
+                    case Direction.Right:
+                        image = garlicImages.right[garlic_animation_frame];
+                        break;
+                }
+                // Add offset based on garlic's move percentage
+                switch (garlic.direction) {
+                    case Direction.Left:
+                        offsetX = -(garlic.move_percentage / 100) * 32;
+                        break;
+                    case Direction.Right:
+                        offsetX = (garlic.move_percentage / 100) * 32;
+                        break;
+                    case Direction.Up:
+                        offsetY = -(garlic.move_percentage / 100) * 32;
+                        break;
+                    case Direction.Down:
+                        offsetY = (garlic.move_percentage / 100) * 32;
+                        break;
+                }
+                ctx.drawImage(image, x * 32 + offsetX, y * 32 + offsetY, 32, 32);
+            }
+        }
+    }
+
+}
+
 function drawPlayers(ctx: CanvasRenderingContext2D, board: Array<Array<Field | Balloon | Player>>){
-    for(const [y, row] of board.entries()){
-        for(const [x, field] of row.entries()){
+    for(const [_, row] of board.entries()){
+        for(const [_, field] of row.entries()){
             if(typeof field === 'object' && field.discriminator === 'player'){
                 const player = field as Player;
                 const image = playerImages[player.direction][player.animation_frame];
