@@ -1,3 +1,3 @@
 <?php
 
-echo "azure more like azbesture"
+echo "azure more like azbesture";
